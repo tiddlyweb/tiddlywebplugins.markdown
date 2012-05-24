@@ -12,7 +12,5 @@ def test_urlification():
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
     output = render(tiddler, environ)
 
-    print 'OUTPUT', output
-
     for url in ["http://example.org", "http://www.example.com/foo/bar"]:
         assert '<a href="%(url)s">%(url)s</a>' % { "url": url } in output
