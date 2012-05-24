@@ -27,8 +27,7 @@ import markdown2
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'), # XXX: should be surrounded by \b
     'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
-    'barelink': re.compile(r'(?<!"|>)((https?://|www)[-\w./#?%=&]+)')
-
+    'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)')
 }
 
 
