@@ -26,7 +26,9 @@ import markdown2
 
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'), # XXX: should be surrounded by \b
-    'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)')
+    'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
+    'barelink': re.compile(r'(?<!"|>)((https?://|www)[-\w./#?%=&]+)')
+
 }
 
 
@@ -91,7 +93,8 @@ def render(tiddler, environ):
     if wiki_link_base is not None:
         link_patterns = [
             (PATTERNS['freelink'], FreeLinker(wiki_link_base)),
-            (PATTERNS['wikilink'], r"\1")
+            (PATTERNS['wikilink'], r'\1'),
+            (PATTERNS['barelink'], r'\1'),
         ]
     else:
         link_patterns = []
