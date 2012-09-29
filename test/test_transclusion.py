@@ -15,6 +15,10 @@ environ = {
     'wikitext.type_render_map' : {
         'text/x-markdown': 'tiddlywebplugins.markdown'
         }
+    },
+    'tiddlyweb.usersign': {
+        'name': 'GUEST',
+        'roles': []
     }
 }
 
@@ -32,7 +36,7 @@ def setup_module(module):
     store.put(Bag('bag'))
     module.store = store
 
-    recipe = Recipe('recipe')
+    recipe = Recipe('recipe_public')
     recipe.set_recipe([('bag', '')])
     store.put(recipe)
 
@@ -58,7 +62,7 @@ def test_no_bag():
 
 
 def test_recipe():
-    tiddlerB.recipe = 'recipe'
+    tiddlerB.recipe = 'recipe_public'
     output = render(tiddlerB, environ)
 
     assert 'I am _tiddler_' in output
@@ -82,3 +86,17 @@ def test_double_render_transclude():
 
     assert 'I am <em>tiddler</em>' in output
     assert 'You wish' in output
+
+def test_space_include():
+    tiddlerB.text = '''
+Hey There
+
+{{tiddler a}}@recipe
+
+We called that from outside, yo
+'''
+
+    output = render(tiddlerB, environ)
+
+    assert 'I am <em>tiddler</em>' in output
+    assert 'We called that from outside,' in output

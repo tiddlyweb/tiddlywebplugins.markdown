@@ -27,6 +27,8 @@ from tiddlyweb.control import determine_bag_from_recipe
 from tiddlyweb.util import renderable
 from tiddlyweb.store import StoreError
 from tiddlyweb.web.util import encode_name
+from tiddlyweb.model.bag import Bag
+from tiddlyweb.model.policy import PermissionsError
 from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.wikitext import render_wikitext
@@ -39,13 +41,14 @@ PATTERNS = {
 }
 
 try:
-   from tiddlywebplugins.tiddlyspace.spaces import space_uri
-   PATTERNS['spacelink'] = (
+    from tiddlywebplugins.tiddlyspace.spaces import space_uri
+    PATTERNS['spacelink'] = (
            re.compile(r'(?:^|\s)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
-   PATTERNS['spacewikilink'] = (
+    PATTERNS['spacewikilink'] = (
            re.compile(r'(?:^|\s)([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
-   PATTERNS['spacefreelink'] = (
+    PATTERNS['spacefreelink'] = (
            re.compile(r'(?:^|\s)\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+    TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>')
 except ImportError:
     pass
 
@@ -140,7 +143,14 @@ class Markdown(markdown2.Markdown):
     def postprocess(self, text):
 
         def transcluder(match):
-            interior_title = match.groups()[0]
+            space_recipe = None
+            try:
+                interior_title = match.groups()[0]
+                space = match.groups()[1]
+                if space:
+                    space_recipe = '%s_public' % space
+            except IndexError:
+                pass
 
             if interior_title in self.transclude_stack:
                 return ''
@@ -152,15 +162,26 @@ class Markdown(markdown2.Markdown):
             interior_tiddler = Tiddler(interior_title)
             try:
                 store = self.environ['tiddlyweb.store']
-                if self.tiddler.recipe:
-                    interior_tiddler.recipe = self.tiddler.recipe
-                    recipe = store.get(Recipe(self.tiddler.recipe))
-                    interior_tiddler.bag = determine_bag_from_recipe(
-                            recipe, interior_tiddler, self.environ).name
+                if space_recipe:
+                    public_recipe = store.get(Recipe(space_recipe))
+                    public_recipe.policy.allows(
+                            self.environ['tiddlyweb.usersign'], 'read')
+                    interior_bag = determine_bag_from_recipe(
+                            public_recipe, interior_tiddler, self.environ)
+                    interior_bag = store.get(Bag(interior_bag.name))
+                    interior_bag.policy.allows(
+                            self.environ['tiddlyweb.usersign'], 'read')
+                    interior_tiddler.bag = interior_bag.name
                 else:
-                    interior_tiddler.bag = self.tiddler.bag
+                    if self.tiddler.recipe:
+                        interior_tiddler.recipe = self.tiddler.recipe
+                        recipe = store.get(Recipe(self.tiddler.recipe))
+                        interior_tiddler.bag = determine_bag_from_recipe(
+                                recipe, interior_tiddler, self.environ).name
+                    else:
+                        interior_tiddler.bag = self.tiddler.bag
                 interior_tiddler = store.get(interior_tiddler)
-            except (StoreError, KeyError):
+            except (StoreError, KeyError, PermissionsError), exc:
                 return ''
             if renderable(interior_tiddler, self.environ):
                 content = render_wikitext(interior_tiddler, self.environ)
