@@ -23,12 +23,48 @@ then set
 import re
 import markdown2
 
+from tiddlyweb.web.util import encode_name
+
 
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'), # XXX: should be surrounded by \b
     'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
     'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)')
 }
+
+try:
+   from tiddlywebplugins.tiddlyspace.spaces import space_uri
+   PATTERNS['spacelink'] = (
+           re.compile(r'(?:^|\s)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+   PATTERNS['spacewikilink'] = (
+           re.compile(r'(?:^|\s)([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+   PATTERNS['spacefreelink'] = (
+           re.compile(r'(?:^|\s)\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+except ImportError:
+    pass
+
+class SpaceLinker(object):
+
+    def __init__(self, environ):
+        self.environ = environ
+
+    def __call__(self, match):
+        match_length = len(match.groups())
+        if match_length == 1:
+            space_name = match.groups()[0]
+            url = space_uri(self.environ, space_name)
+            return (url, '@%s' % space_name)
+        else:
+            page_name = match.groups()[0]
+            space_name = match.groups()[1]
+            try:
+                label, page = page_name.split("|", 1)
+            except ValueError:
+                label = page = page_name
+
+            url = '%s%s' % (space_uri(self.environ, space_name),
+                    encode_name(page))
+            return (url, label)
 
 
 class FreeLinker(object):
@@ -95,6 +131,9 @@ def render(tiddler, environ):
             (PATTERNS['wikilink'], r'\1'),
             (PATTERNS['barelink'], r'\1'),
         ]
+        if 'spacelink' in PATTERNS:
+            for pattern in ['spacelink', 'spacewikilink', 'spacefreelink']:
+                link_patterns.insert(0, (PATTERNS[pattern], SpaceLinker(environ)))
     else:
         link_patterns = []
     processor = Markdown(extras=['link-patterns'],
