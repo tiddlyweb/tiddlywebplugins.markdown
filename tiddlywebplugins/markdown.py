@@ -23,13 +23,16 @@ then set
 import re
 import markdown2
 
+from tiddlyweb.util import renderable
 from tiddlyweb.web.util import encode_name
+from tiddlyweb.model.tiddler import Tiddler
+from tiddlyweb.wikitext import render_wikitext
 
-
+TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'), # XXX: should be surrounded by \b
     'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
-    'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)')
+    'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)'),
 }
 
 try:
@@ -87,6 +90,19 @@ g_escape_table = markdown2.g_escape_table
 _hash_text = markdown2._hash_text
 class Markdown(markdown2.Markdown):
 
+    def __init__(self, *args, **kwargs):
+        environ = kwargs['environ']
+        tiddler = kwargs['tiddler']
+        del kwargs['environ']
+        del kwargs['tiddler']
+        if environ == None:
+            environ = {}
+        self.environ = environ
+        self.tiddler = tiddler
+        self.transclude_stack = {}
+        # super
+        markdown2.Markdown.__init__(self, *args, **kwargs)
+
     def _do_link_patterns(self, text):
         link_from_hash = {}
         for regex, repl in self.link_patterns:
@@ -118,6 +134,33 @@ class Markdown(markdown2.Markdown):
             text = text.replace(hash, link)
         return text
 
+    def postprocess(self, text):
+
+        def transcluder(match):
+            interior_title = match.groups()[0]
+
+            if interior_title in self.transclude_stack:
+                return ''
+            try:
+                self.transclude_stack[self.tiddler.title].append(interior_title)
+            except KeyError:
+                self.transclude_stack[self.tiddler.title] = [interior_title]
+
+            bag = self.tiddler.bag
+            interior_tiddler = Tiddler(interior_title, bag)
+            store = self.environ['tiddlyweb.store']
+            try:
+                interior_tiddler = store.get(interior_tiddler)
+            except StoreError:
+                return ''
+            if renderable(interior_tiddler, self.environ):
+                content = render_wikitext(interior_tiddler, self.environ)
+            else:
+                content = ''
+            return content
+
+        return re.sub(TRANSCLUDE_RE, transcluder, text)
+
 
 def render(tiddler, environ):
     """
@@ -137,5 +180,5 @@ def render(tiddler, environ):
     else:
         link_patterns = []
     processor = Markdown(extras=['link-patterns'],
-            link_patterns=link_patterns)
+            link_patterns=link_patterns, environ=environ, tiddler=tiddler)
     return processor.convert(tiddler.text)
