@@ -23,8 +23,11 @@ then set
 import re
 import markdown2
 
+from tiddlyweb.control import determine_bag_from_recipe
 from tiddlyweb.util import renderable
+from tiddlyweb.store import StoreError
 from tiddlyweb.web.util import encode_name
+from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.wikitext import render_wikitext
 
@@ -146,12 +149,18 @@ class Markdown(markdown2.Markdown):
             except KeyError:
                 self.transclude_stack[self.tiddler.title] = [interior_title]
 
-            bag = self.tiddler.bag
-            interior_tiddler = Tiddler(interior_title, bag)
-            store = self.environ['tiddlyweb.store']
+            interior_tiddler = Tiddler(interior_title)
             try:
+                store = self.environ['tiddlyweb.store']
+                if self.tiddler.recipe:
+                    interior_tiddler.recipe = self.tiddler.recipe
+                    recipe = store.get(Recipe(self.tiddler.recipe))
+                    interior_tiddler.bag = determine_bag_from_recipe(
+                            recipe, interior_tiddler, self.environ).name
+                else:
+                    interior_tiddler.bag = self.tiddler.bag
                 interior_tiddler = store.get(interior_tiddler)
-            except StoreError:
+            except (StoreError, KeyError):
                 return ''
             if renderable(interior_tiddler, self.environ):
                 content = render_wikitext(interior_tiddler, self.environ)

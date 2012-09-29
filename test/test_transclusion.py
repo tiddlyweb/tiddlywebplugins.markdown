@@ -2,6 +2,7 @@
 import shutil
 from tiddlywebplugins.markdown import render
 from tiddlyweb.model.bag import Bag
+from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.config import config
 
@@ -31,12 +32,15 @@ def setup_module(module):
     store.put(Bag('bag'))
     module.store = store
 
+    recipe = Recipe('recipe')
+    recipe.set_recipe([('bag', '')])
+    store.put(recipe)
+
     tiddlerA = Tiddler('tiddler a', 'bag')
     tiddlerA.text = 'I am _tiddler_'
     store.put(tiddlerA)
 
-def test_simple_transclude():
-    tiddlerB = Tiddler('tiddler b', 'bag')
+    tiddlerB = Tiddler('tiddler b')
     tiddlerB.text = '''
 You wish
 
@@ -44,24 +48,35 @@ You wish
 
 And I wish too.
 '''
+    module.tiddlerB = tiddlerB
 
+def test_no_bag():
+    output = render(tiddlerB, environ)
+
+    assert 'I am _tiddler_' not in output
+    assert 'You wish' in output
+
+
+def test_recipe():
+    tiddlerB.recipe = 'recipe'
     output = render(tiddlerB, environ)
 
     assert 'I am _tiddler_' in output
     assert 'You wish' in output
 
+
+def test_bag():
+    output = render(tiddlerB, environ)
+    tiddlerB.bag = 'bag'
+
+    assert 'I am _tiddler_' in output
+    assert 'You wish' in output
+
+
 def test_double_render_transclude():
     tiddlerA = store.get(Tiddler('tiddler a', 'bag'))
     tiddlerA.type = 'text/x-markdown'
     store.put(tiddlerA)
-    tiddlerB = Tiddler('tiddler b', 'bag')
-    tiddlerB.text = '''
-You wish
-
-{{tiddler a}}
-
-And I wish too.
-'''
 
     output = render(tiddlerB, environ)
 
