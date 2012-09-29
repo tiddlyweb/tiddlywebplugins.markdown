@@ -163,21 +163,14 @@ class Markdown(markdown2.Markdown):
             try:
                 store = self.environ['tiddlyweb.store']
                 if space_recipe:
-                    public_recipe = store.get(Recipe(space_recipe))
-                    public_recipe.policy.allows(
-                            self.environ['tiddlyweb.usersign'], 'read')
-                    interior_bag = determine_bag_from_recipe(
-                            public_recipe, interior_tiddler, self.environ)
-                    interior_bag = store.get(Bag(interior_bag.name))
-                    interior_bag.policy.allows(
-                            self.environ['tiddlyweb.usersign'], 'read')
+                    interior_bag = get_bag_from_recipe(self.environ, space_recipe,
+                            interior_tiddler)
                     interior_tiddler.bag = interior_bag.name
                 else:
                     if self.tiddler.recipe:
-                        interior_tiddler.recipe = self.tiddler.recipe
-                        recipe = store.get(Recipe(self.tiddler.recipe))
-                        interior_tiddler.bag = determine_bag_from_recipe(
-                                recipe, interior_tiddler, self.environ).name
+                        interior_bag = get_bag_from_recipe(self.environ,
+                                self.tiddler.recipe, interior_tiddler)
+                        interior_tiddler.bag = interior_bag.name
                     else:
                         interior_tiddler.bag = self.tiddler.bag
                 interior_tiddler = store.get(interior_tiddler)
@@ -190,6 +183,21 @@ class Markdown(markdown2.Markdown):
             return content
 
         return re.sub(TRANSCLUDE_RE, transcluder, text)
+
+
+def get_bag_from_recipe(environ, recipe_name, tiddler):
+    """
+    Check recipe policy, determine which bag this tiddler
+    ought to come from, and check that bag's policy too.
+    Raises StoreError and PermissionsError.
+    """
+    store = environ['tiddlyweb.store']
+    recipe = store.get(Recipe(recipe_name))
+    recipe.policy.allows(environ['tiddlyweb.usersign'], 'read')
+    bag = determine_bag_from_recipe(recipe, tiddler, environ)
+    bag = store.get(Bag(bag.name))
+    bag.policy.allows(environ['tiddlyweb.usersign'], 'read')
+    return bag
 
 
 def render(tiddler, environ):
