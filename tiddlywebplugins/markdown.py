@@ -37,7 +37,7 @@ TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'),
     'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
-    'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)'),
+    'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)')
 }
 
 try:
