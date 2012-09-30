@@ -40,7 +40,7 @@ def test_bounded_spacelink():
 
     output = render(tiddler, environ)
 
-    assert '<a href="http://cdent.tiddlyspace.org:8080/">@cdent</a>' in output
+    assert ' <a href="http://cdent.tiddlyspace.org:8080/">@cdent</a>' in output
     assert '@cdent' in output
 
 def test_spacelink_first():
@@ -57,6 +57,14 @@ def test_spacelink_first():
 def test_spacewiki_link():
     tiddler = Tiddler('test')
     tiddler.text = "This is WikiLink@cdent"
+    output = render(tiddler, environ)
+    assert '<a href="http://cdent.tiddlyspace.org:8080/WikiLink">WikiLink</a>' in output
+    assert 'This is <a' in output
+
+
+def test_spacewiki_first():
+    tiddler = Tiddler('test')
+    tiddler.text = "WikiLink@cdent"
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/WikiLink">WikiLink</a>' in output
 

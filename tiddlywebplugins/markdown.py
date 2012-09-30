@@ -54,11 +54,11 @@ PATTERNS = {
 try:
     from tiddlywebplugins.tiddlyspace.spaces import space_uri
     PATTERNS['spacelink'] = (
-            re.compile(r'(?:^|\s)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'))
+            re.compile(r'(?:^|(?<=\s))@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'))
     PATTERNS['spacewikilink'] = (
-            re.compile(r'(?:^|\s)([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+            re.compile(r'(?:^|(?<=\s))([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?=\s|$)'))
     PATTERNS['spacefreelink'] = (
-            re.compile(r'(?:^|\s)\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+            re.compile(r'(?:^|(?<=\s))\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
     TRANSCLUDE_RE = (
             re.compile(r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>'))
 except ImportError:
