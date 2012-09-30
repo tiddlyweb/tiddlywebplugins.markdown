@@ -25,5 +25,5 @@ def test_precedence():
 
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
     output = render(tiddler, environ)
-    
+
     assert "http://<a href" not in output

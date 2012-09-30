@@ -1,5 +1,5 @@
-
 import shutil
+
 from tiddlywebplugins.markdown import render
 from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.recipe import Recipe
@@ -12,7 +12,7 @@ from tiddlywebplugins.utils import get_store
 environ = {
     'tiddlyweb.config': {
         'markdown.wiki_link_base': '',
-    'wikitext.type_render_map' : {
+    'wikitext.type_render_map': {
         'text/x-markdown': 'tiddlywebplugins.markdown'
         }
     },
@@ -54,6 +54,7 @@ And I wish too.
 '''
     module.tiddlerB = tiddlerB
 
+
 def test_no_bag():
     output = render(tiddlerB, environ)
 
@@ -86,6 +87,7 @@ def test_double_render_transclude():
 
     assert 'I am <em>tiddler</em>' in output
     assert 'You wish' in output
+
 
 def test_space_include():
     tiddlerB.text = '''
