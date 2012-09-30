@@ -7,6 +7,17 @@ then CamelCase words will becomes links, prefix
 by wiki_link_base. Set it to '' to activate WikiLinks
 without any prefix.
 
+This version of markdown supports transclusion using
+the following syntax:
+
+    {{tiddler title}}
+
+on a line by itself will include that tiddler, if it 
+exists. If in a TiddlySpace environment then interspace
+transclusion is possible:
+
+    {{tiddler title}}@spacename
+
 To use on Tiddlers which have a type of 'text/x-markdown'
 adjust config to include:
 
