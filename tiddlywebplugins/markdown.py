@@ -35,7 +35,7 @@ from tiddlyweb.wikitext import render_wikitext
 
 TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
 PATTERNS = {
-    'freelink': re.compile(r'\[\[(.+?)\]\]'), # XXX: should be surrounded by \b
+    'freelink': re.compile(r'\[\[(.+?)\]\]'),
     'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
     'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)'),
 }
@@ -43,14 +43,16 @@ PATTERNS = {
 try:
     from tiddlywebplugins.tiddlyspace.spaces import space_uri
     PATTERNS['spacelink'] = (
-           re.compile(r'(?:^|\s)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+            re.compile(r'(?:^|\s)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
     PATTERNS['spacewikilink'] = (
-           re.compile(r'(?:^|\s)([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+            re.compile(r'(?:^|\s)([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
     PATTERNS['spacefreelink'] = (
-           re.compile(r'(?:^|\s)\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
-    TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>')
+            re.compile(r'(?:^|\s)\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\s|$)'))
+    TRANSCLUDE_RE = (
+            re.compile(r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>'))
 except ImportError:
     pass
+
 
 class SpaceLinker(object):
 
@@ -85,7 +87,7 @@ class FreeLinker(object):
         link = match.groups()[0]
         try:
             label, page = link.split("|", 1)
-        except ValueError: # no label
+        except ValueError:  # no label
             label = page = link
         return (page, label)
 
@@ -94,6 +96,8 @@ class FreeLinker(object):
 # XXX: patch pending: https://github.com/trentm/python-markdown2/pull/53
 g_escape_table = markdown2.g_escape_table
 _hash_text = markdown2._hash_text
+
+
 class Markdown(markdown2.Markdown):
 
     def __init__(self, *args, **kwargs):
@@ -101,7 +105,7 @@ class Markdown(markdown2.Markdown):
         tiddler = kwargs['tiddler']
         del kwargs['environ']
         del kwargs['tiddler']
-        if environ == None:
+        if environ is None:
             environ = {}
         self.environ = environ
         self.tiddler = tiddler
@@ -114,9 +118,9 @@ class Markdown(markdown2.Markdown):
         for regex, repl in self.link_patterns:
             replacements = []
             for match in regex.finditer(text):
-                title = None # XXX: rename variable (ambiguous/misleading)
+                title = None  # XXX: rename variable (ambiguous/misleading)
                 if hasattr(repl, "__call__"):
-                    components = repl(match) # XXX: rename variable
+                    components = repl(match)  # XXX: rename variable
                     try:
                         href, title = components
                     except ValueError:
@@ -155,7 +159,8 @@ class Markdown(markdown2.Markdown):
             if interior_title in self.transclude_stack:
                 return ''
             try:
-                self.transclude_stack[self.tiddler.title].append(interior_title)
+                self.transclude_stack[self.tiddler.title].append(
+                        interior_title)
             except KeyError:
                 self.transclude_stack[self.tiddler.title] = [interior_title]
 
@@ -163,8 +168,8 @@ class Markdown(markdown2.Markdown):
             try:
                 store = self.environ['tiddlyweb.store']
                 if space_recipe:
-                    interior_bag = get_bag_from_recipe(self.environ, space_recipe,
-                            interior_tiddler)
+                    interior_bag = get_bag_from_recipe(self.environ,
+                            space_recipe, interior_tiddler)
                     interior_tiddler.bag = interior_bag.name
                 else:
                     if self.tiddler.recipe:
@@ -214,7 +219,8 @@ def render(tiddler, environ):
         ]
         if 'spacelink' in PATTERNS:
             for pattern in ['spacelink', 'spacewikilink', 'spacefreelink']:
-                link_patterns.insert(0, (PATTERNS[pattern], SpaceLinker(environ)))
+                link_patterns.insert(0, (PATTERNS[pattern],
+                    SpaceLinker(environ)))
     else:
         link_patterns = []
     processor = Markdown(extras=['link-patterns'],
