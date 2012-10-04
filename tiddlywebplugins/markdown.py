@@ -196,7 +196,7 @@ class Markdown(markdown2.Markdown):
                 content = render_wikitext(interior_tiddler, self.environ)
             else:
                 content = ''
-            return content
+            return "<article>%s</article>" % content
 
         return re.sub(TRANSCLUDE_RE, transcluder, text)
 

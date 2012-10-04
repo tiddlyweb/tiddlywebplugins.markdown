@@ -108,5 +108,5 @@ We called that from outside, yo
 
     output = render(tiddlerB, environ)
 
-    assert 'I am <em>tiddler</em>' in output
+    assert '<article><p>I am <em>tiddler</em></p>\n</article>' in output
     assert 'We called that from outside,' in output
