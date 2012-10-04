@@ -96,7 +96,7 @@ def test_double_render_transclude():
     assert 'You wish' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_space_include():
     tiddlerB.text = '''
 Hey There

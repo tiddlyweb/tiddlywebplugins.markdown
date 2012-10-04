@@ -22,7 +22,7 @@ except ImportError:
     tiddlyspace = False
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_simple_spacelink():
     tiddler = Tiddler('test')
     tiddler.text = '# Hi\nVisit @cdent for more info.'
@@ -42,7 +42,7 @@ def test_escaped_spacelink():
     assert '@cdent' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_bounded_spacelink():
     tiddler = Tiddler('test')
     tiddler.text = '# Hi\nVisit @cdent: for more info.'
@@ -53,7 +53,7 @@ def test_bounded_spacelink():
     assert '@cdent' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_spacelink_first():
     tiddler = Tiddler('test')
     tiddler.text = '@cdent for more info.'
@@ -65,7 +65,7 @@ def test_spacelink_first():
     assert '<a href="http://cdent.tiddlyspace.org:8080/">@cdent</a>' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_spacewiki_link():
     tiddler = Tiddler('test')
     tiddler.text = "This is WikiLink@cdent"
@@ -74,7 +74,7 @@ def test_spacewiki_link():
     assert 'This is <a' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_spacewiki_first():
     tiddler = Tiddler('test')
     tiddler.text = "WikiLink@cdent"
@@ -82,7 +82,7 @@ def test_spacewiki_first():
     assert '<a href="http://cdent.tiddlyspace.org:8080/WikiLink">WikiLink</a>' in output
 
 
-@pytest.mark.skipif("tiddlyspace == False")
+@pytest.mark.skipif('tiddlyspace == False')
 def test_spacefree_link():
     tiddler = Tiddler('test')
     tiddler.text = "This is [[Free Link]]@cdent"

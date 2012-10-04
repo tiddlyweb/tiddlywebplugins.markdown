@@ -2,6 +2,9 @@ A Markdown wikitext renderer for TiddlyWeb.
 
 See the code for details.
 
+NB: In order for space links and transclusion to work (also in tests),
+`tiddlywebplugins.tiddlyspace` is required.
+
 Copyright 2009, Chris Dent <cdent@peemore.com>
 
 Licensed under the same terms as TiddlyWeb
