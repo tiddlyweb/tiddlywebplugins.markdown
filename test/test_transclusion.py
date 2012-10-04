@@ -1,4 +1,5 @@
 import shutil
+import pytest
 
 from tiddlywebplugins.markdown import render
 from tiddlyweb.model.bag import Bag
@@ -21,6 +22,12 @@ environ = {
         'roles': []
     }
 }
+
+try:
+    import tiddlywebplugins.tiddlyspace
+    tiddlyspace = True
+except ImportError:
+    tiddlyspace = False
 
 
 def setup_module(module):
@@ -89,6 +96,7 @@ def test_double_render_transclude():
     assert 'You wish' in output
 
 
+@pytest.mark.skipif("tiddlyspace == False")
 def test_space_include():
     tiddlerB.text = '''
 Hey There
