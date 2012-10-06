@@ -108,5 +108,6 @@ We called that from outside, yo
 
     output = render(tiddlerB, environ)
 
-    assert '<article><p>I am <em>tiddler</em></p>\n</article>' in output
+    assert '<article class="transclusion" data-title="tiddler a" ' \
+            'data-bag="bag"><p>I am <em>tiddler</em></p>\n</article>' in output
     assert 'We called that from outside,' in output
