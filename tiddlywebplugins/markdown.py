@@ -196,7 +196,9 @@ class Markdown(markdown2.Markdown):
                 content = render_wikitext(interior_tiddler, self.environ)
             else:
                 content = ''
-            return content
+            return '<article class="transclusion" data-title="%s" ' \
+                    'data-bag="%s">%s</article>' % (interior_tiddler.title,
+                            interior_tiddler.bag, content)
 
         return re.sub(TRANSCLUDE_RE, transcluder, text)
 
