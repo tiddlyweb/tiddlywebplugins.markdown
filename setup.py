@@ -22,6 +22,6 @@ setup(
         install_requires = ['tiddlywebplugins.utils', 'markdown2'],
         extras_require = {
             'tiddlyspace':  ['tiddlywebplugins.tiddlyspace']
-        }
+        },
         zip_safe = False,
         )
