@@ -85,6 +85,18 @@ def test_spacewiki_first():
 @pytest.mark.skipif('tiddlyspace == False')
 def test_spacefree_link():
     tiddler = Tiddler('test')
+
+    tiddler.text = "[[Free Link]]@cdent"
+    output = render(tiddler, environ)
+    assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
+    tiddler.text = "lorem\n[[Free Link]]@cdent\nipsum"
+    output = render(tiddler, environ)
+    assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
+
     tiddler.text = "This is [[Free Link]]@cdent"
+    output = render(tiddler, environ)
+    assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
+
+    tiddler.text = "This is [[Free Link]]@cdent: lorem ipsum"
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
