@@ -17,6 +17,9 @@ This is WikiLink and this is not: [NotLink](http://example.com).
 This forthcoming in camel case but actually
 a link [label](http://example.org/CamelCase)
 
+This is (HtmlJavascript in parens).
+This is (parens around HtmlJavascript).
+
 """
 
 
@@ -40,3 +43,5 @@ def test_no_wiki():
     output = render(tiddler, environ)
     assert '"NotLink"' not in output
     assert '<a href="http://example.org/CamelCase">label</a>' in output
+
+    print output

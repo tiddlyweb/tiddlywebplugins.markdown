@@ -47,7 +47,7 @@ from tiddlyweb.wikitext import render_wikitext
 TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
 PATTERNS = {
     'freelink': re.compile(r'\[\[(.+?)\]\]'),
-    'wikilink': re.compile(r'((?<=\s)[A-Z][a-z]+[A-Z]\w+\b)'),
+    'wikilink': re.compile(r'((?<=[\s\("\'])[A-Z][a-z]+[A-Z]\w+\b)'),
     'barelink': re.compile(r'(?<!">|=")(https?://[-\w./#?%=&]+)')
 }
 
@@ -56,7 +56,7 @@ try:
     PATTERNS['spacelink'] = (
             re.compile(r'(?:^|(?<=\s))@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'))
     PATTERNS['spacewikilink'] = (
-            re.compile(r'(?:^|(?<=\s))([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b)'))
+            re.compile(r'(?:^|(?<=[\s\("\']))([A-Z][a-z]+[A-Z]\w+)@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b)'))
     PATTERNS['spacefreelink'] = (
             re.compile(r'(?:^|(?<=\s))\[\[(.+?)\]\]@([0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b)'))
     TRANSCLUDE_RE = (
