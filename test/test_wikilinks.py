@@ -44,4 +44,6 @@ def test_no_wiki():
     assert '"NotLink"' not in output
     assert '<a href="http://example.org/CamelCase">label</a>' in output
 
-    print output
+    assert '(<a href="HtmlJavascript">HtmlJavascript</a> in parens)' in output
+    assert '(parens around <a href="HtmlJavascript">HtmlJavascript</a>)' in output
+
