@@ -5,14 +5,15 @@ from tiddlyweb.model.tiddler import Tiddler
 def test_urlification():
     tiddler = Tiddler('blah')
     tiddler.text = """
-lorem ipsum <http://example.org> dolor sit amet
-... <http://www.example.com/foo/bar> ...
+lorem ipsum http://example.org dolor sit amet
+... http://www.example.com/foo/bar ... and <http://example.com>
      """
 
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
     output = render(tiddler, environ)
 
-    for url in ["http://example.org", "http://www.example.com/foo/bar"]:
+    for url in ["http://example.org", "http://www.example.com/foo/bar",
+            'http://example.com']:
         assert '<a href="%(url)s">%(url)s</a>' % { "url": url } in output
 
 

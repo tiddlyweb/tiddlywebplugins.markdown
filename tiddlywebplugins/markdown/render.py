@@ -41,6 +41,7 @@ def render(tiddler, environ):
     base = environ.get('tiddlyweb.config', {}).get('markdown.wiki_link_base')
     extensions = ['headerid', 'footnotes', 'fenced_code', 'def_list']
     extension_configs = {}
+    extensions.append('tiddlywebplugins.markdown.autolink')
     if base is not None:
         extensions.append('tiddlywebplugins.markdown.links')
         extensions.append('tiddlywebplugins.markdown.transclusion')
