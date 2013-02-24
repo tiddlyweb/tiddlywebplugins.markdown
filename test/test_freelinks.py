@@ -97,6 +97,8 @@ def test_precedence():
     assert '<a class="wikilink" href="hello%20FooBar%20world">...</a>' in output
     assert output == '<p>lorem <a class="wikilink" href="hello%20FooBar%20world">...</a> ipsum</p>'
 
+# XXX: this can be fixed, but see:
+# https://github.com/waylan/Python-Markdown/issues/196
 @pytest.mark.xfail
 def test_precedence_in_markdown_link():
     tiddler = Tiddler('Foo')
