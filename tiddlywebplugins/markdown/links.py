@@ -26,14 +26,13 @@ class MarkdownLinksExtension(WikiLinkExtension):
 
     def __init__(self, configs):
         self.config = {
-                'base_url' : ['', 'String to append to beginning or URL.'],
-                'end_url' : ['', 'String to append to end of URL.'],
-                'html_class' : ['wikilink', 'CSS hook. Leave blank for none.'],
+                'base_url': ['', 'String to append to beginning or URL.'],
+                'end_url': ['', 'String to append to end of URL.'],
+                'html_class': ['wikilink', 'CSS hook. Leave blank for none.'],
                 'environ': [{}, 'Base wsgi environ'],
         }
         for key, value in configs:
             self.setConfig(key, value)
-
 
     def extendMarkdown(self, md, md_globals):
         self.md = md
@@ -41,7 +40,8 @@ class MarkdownLinksExtension(WikiLinkExtension):
         if TIDDLYSPACE:
             wikispacelinkPattern = SpaceLinks(WIKISPACE, self.getConfigs())
             wikispacelinkPattern.md = md
-            md.inlinePatterns.add('wikispacelink', wikispacelinkPattern, '<link')
+            md.inlinePatterns.add('wikispacelink', wikispacelinkPattern,
+                    '<link')
 
             freespacelinkPattern = SpaceLinks(FREESPACE, self.getConfigs())
             freespacelinkPattern.md = md
@@ -50,8 +50,8 @@ class MarkdownLinksExtension(WikiLinkExtension):
 
             spacelinkPattern = SpaceLinks(SPACELINK, self.getConfigs())
             spacelinkPattern.md = md
-            md.inlinePatterns.add('spacelink', spacelinkPattern, '>wikispacelink')
-
+            md.inlinePatterns.add('spacelink', spacelinkPattern,
+                    '>wikispacelink')
 
         wikilinkPattern = MarkdownLinks(WIKILINK, self.getConfigs())
         wikilinkPattern.md = md
@@ -60,7 +60,6 @@ class MarkdownLinksExtension(WikiLinkExtension):
         freelinkPattern = MarkdownLinks(FREELINK, self.getConfigs())
         freelinkPattern.md = md
         md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
-
 
 
 class SpaceLinks(inlinepatterns.Pattern):
@@ -92,6 +91,7 @@ class SpaceLinks(inlinepatterns.Pattern):
                 a.set('href', space_uri(self.config['environ'], space))
                 return a
         return ''
+
 
 class MarkdownLinks(WikiLinks):
 

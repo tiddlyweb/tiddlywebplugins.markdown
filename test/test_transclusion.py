@@ -13,14 +13,21 @@ from tiddlywebplugins.utils import get_store
 environ = {
     'tiddlyweb.config': {
         'markdown.wiki_link_base': '',
-    'wikitext.type_render_map': {
-        'text/x-markdown': 'tiddlywebplugins.markdown'
+        'wikitext.type_render_map': {
+            'text/x-markdown': 'tiddlywebplugins.markdown'
+        },
+        'server_host': {
+            'scheme': 'http',
+            'host': 'tiddlyspace.com',
+            'port': '80'
         }
     },
     'tiddlyweb.usersign': {
         'name': 'GUEST',
         'roles': []
-    }
+    },
+    # get friendly urls doing their thing
+    'wsgi.url_scheme': 'http'
 }
 
 try:
@@ -40,14 +47,14 @@ def setup_module(module):
 
     environ['tiddlyweb.store'] = store
 
-    store.put(Bag('bag'))
+    store.put(Bag('bag_public'))
     module.store = store
 
     recipe = Recipe('recipe_public')
-    recipe.set_recipe([('bag', '')])
+    recipe.set_recipe([('bag_public', '')])
     store.put(recipe)
 
-    tiddlerA = Tiddler('tiddler a', 'bag')
+    tiddlerA = Tiddler('tiddler a', 'bag_public')
     tiddlerA.text = 'I am _tiddler_'
     store.put(tiddlerA)
 
@@ -79,14 +86,14 @@ def test_recipe():
 
 def test_bag():
     output = render(tiddlerB, environ)
-    tiddlerB.bag = 'bag'
+    tiddlerB.bag = 'bag_public'
 
     assert 'I am _tiddler_' in output
     assert 'You wish' in output
 
 
 def test_double_render_transclude():
-    tiddlerA = store.get(Tiddler('tiddler a', 'bag'))
+    tiddlerA = store.get(Tiddler('tiddler a', 'bag_public'))
     tiddlerA.type = 'text/x-markdown'
     store.put(tiddlerA)
 
@@ -108,6 +115,7 @@ We called that from outside, yo
 
     output = render(tiddlerB, environ)
 
-    assert '<article class="transclusion" data-title="tiddler a" ' \
-            'data-bag="bag"><p>I am <em>tiddler</em></p></article>' in output
+# Note: the URI here is funkity because of the above config settings
+    assert '<article class="transclusion" data-uri="http://bag.tiddlyspace.com/tiddler%20a" data-title="tiddler a" ' \
+            'data-bag="bag_public"><p>I am <em>tiddler</em></p></article>' in output
     assert 'We called that from outside,' in output

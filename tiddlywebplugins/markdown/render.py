@@ -12,7 +12,7 @@ the following syntax:
 
     {{tiddler title}}
 
-on a line by itself will include that tiddler, if it 
+on a line by itself will include that tiddler, if it
 exists. If in a TiddlySpace environment then interspace
 transclusion is possible:
 
@@ -31,8 +31,8 @@ then set
  'wikitext.default_renderer': 'tiddlywebplugins.markdown'
 """
 
-import re
 import markdown
+
 
 def render(tiddler, environ):
     """

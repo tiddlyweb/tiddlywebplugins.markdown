@@ -16,11 +16,16 @@ from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.wikitext import render_wikitext
 
+TIDDLYSPACE = False
 try:
-    from tiddlywebplugins.tiddlyspace.spaces import space_uri
+    from tiddlywebplugins.tiddlyspace.fixups \
+            import web_tiddler_url as tiddler_url
     TRANSCLUDE_RE = r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>'
+    TIDDLYSPACE = True
 except ImportError:
+    from tiddlyweb.web.util import tiddler_url
     TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
+
 
 def get_bag_from_recipe(environ, recipe_name, tiddler):
     """
@@ -58,7 +63,7 @@ class TranscludeProcessor(Postprocessor):
         # bail out if we are looping
         if interior_title in self.transclude_stack:
             return match.group(0)
-        
+
         # bail out if we have no store
         if not self.store:
             return match.group(0)
@@ -75,6 +80,7 @@ class TranscludeProcessor(Postprocessor):
                 interior_bag = get_bag_from_recipe(self.environ,
                         space_recipe, interior_tiddler)
                 interior_tiddler.bag = interior_bag.name
+                interior_tiddler.recipe = space_recipe
             else:
                 if self.tiddler.recipe:
                     interior_bag = get_bag_from_recipe(self.environ,
@@ -90,9 +96,17 @@ class TranscludeProcessor(Postprocessor):
             content = render_wikitext(interior_tiddler, self.environ)
         else:
             content = ''
-        return '<article class="transclusion" data-title="%s" ' \
-                'data-bag="%s">%s</article>' % (interior_tiddler.title,
+        return '<article class="transclusion" data-uri="%s" ' \
+                'data-title="%s" data-bag="%s">%s</article>' % (
+                        self.interior_url(interior_tiddler),
+                        interior_tiddler.title,
                         interior_tiddler.bag, content)
+
+    def interior_url(self, tiddler):
+        if TIDDLYSPACE:
+            return tiddler_url(self.environ, tiddler, friendly=True)
+        else:
+            return tiddler_url(self.environ, tiddler)
 
     def run(self, text):
         return re.sub(self.pattern, self.transcluder, text)
