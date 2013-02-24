@@ -43,8 +43,11 @@ def render(tiddler, environ):
     extension_configs = {}
     if base is not None:
         extensions.append('tiddlywebplugins.markdown.links')
+        extensions.append('tiddlywebplugins.markdown.transclusion')
         extension_configs['tiddlywebplugins.markdown.links'] = [
                 ('base_url', base), ('environ', environ)]
+        extension_configs['tiddlywebplugins.markdown.transclusion'] = [
+                ('environ', environ), ('tiddler', tiddler)]
 
     return markdown.markdown(tiddler.text,
             extensions=extensions,
