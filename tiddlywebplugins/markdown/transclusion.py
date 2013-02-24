@@ -55,7 +55,10 @@ class TranscludeProcessor(Postprocessor):
     def transcluder(self, match):
         space_recipe = None
         interior_title = match.group(1)
-        space = match.group(2)
+        try:
+            space = match.group(2)
+        except IndexError:
+            space = None
 
         if space:
             space_recipe = '%s_public' % space
