@@ -29,14 +29,14 @@ def test_no_wiki():
 
     environ = {}
     output = render(tiddler, environ)
-    assert '<h1>' in output
+    assert '<h1 id="hello">' in output
     assert '<li>' in output
     assert 'href' not in output
 
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
     output = render(tiddler, environ)
     assert 'href' in output
-    assert '<a href="WikiLink">' in output
+    assert '<a class="wikilink" href="WikiLink">' in output
     assert '>WikiLink</a>' in output
 
     tiddler.text = sample_linked
@@ -44,6 +44,6 @@ def test_no_wiki():
     assert '"NotLink"' not in output
     assert '<a href="http://example.org/CamelCase">label</a>' in output
 
-    assert '(<a href="HtmlJavascript">HtmlJavascript</a> in parens)' in output
-    assert '(parens around <a href="HtmlJavascript">HtmlJavascript</a>)' in output
+    assert '(<a class="wikilink" href="HtmlJavascript">HtmlJavascript</a> in parens)' in output
+    assert '(parens around <a class="wikilink" href="HtmlJavascript">HtmlJavascript</a>)' in output
 
