@@ -49,6 +49,8 @@ then set
  'wikitext.default_renderer': 'tiddlywebplugins.markdown'
 """
 
+__version__ = '1.0.0'
+
 # for sake of making config calls clean, we import render
 # into this space
 from .render import render as markdown_render
