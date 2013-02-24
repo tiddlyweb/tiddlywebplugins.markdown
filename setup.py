@@ -19,7 +19,7 @@ setup(
         packages = find_packages(exclude=['test']),
         author_email = AUTHOR_EMAIL,
         platforms = 'Posix; MacOS X; Windows',
-        install_requires = ['tiddlywebplugins.utils', 'markdown2'],
+        install_requires = ['tiddlyweb', 'Markdown'],
         extras_require = {
             'tiddlyspace':  ['tiddlywebplugins.tiddlyspace']
         },
