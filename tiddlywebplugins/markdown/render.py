@@ -1,34 +1,9 @@
 """
-Render markdown syntax wikitext to HTML
-using the markdown2 library.
+Markdown rendering subsystem.
 
-If 'markdown.wiki_link_base' is set in config,
-then CamelCase words will becomes links, prefix
-by wiki_link_base. Set it to '' to activate WikiLinks
-without any prefix.
-
-This version of markdown supports transclusion using
-the following syntax:
-
-    {{tiddler title}}
-
-on a line by itself will include that tiddler, if it
-exists. If in a TiddlySpace environment then interspace
-transclusion is possible:
-
-    {{tiddler title}}@spacename
-
-To use on Tiddlers which have a type of 'text/x-markdown'
-adjust config to include:
-
- 'wikitext.type_render_map' :{
-     'text/x-markdown': 'tiddlywebplugins.markdown'
-     }
-
-If you want all text tiddlers to be rendered as markdown,
-then set
-
- 'wikitext.default_renderer': 'tiddlywebplugins.markdown'
+We keep the actual activity in here to avoid import difficulties
+while still maintaining easy configuration of the module (in
+tiddlywebconfig.py).
 """
 
 import markdown
