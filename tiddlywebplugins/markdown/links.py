@@ -73,7 +73,7 @@ class SpaceLinks(inlinepatterns.Pattern):
             space = m.group(3)
             if page and space:
                 if '|' in page:
-                    label, target = page
+                    label, target = page.split('|', 1)
                 else:
                     label = target = page
                 a = util.etree.Element('a')
@@ -101,7 +101,7 @@ class MarkdownLinks(WikiLinks):
             matched_text = matched_text.strip()
             base_url, end_url, html_class = self._getMeta()
             if '|' in matched_text:
-                label, target = matched_text.split('|')
+                label, target = matched_text.split('|', 1)
             else:
                 label = target = matched_text
             url = '%s%s%s' % (base_url, encode_name(target), end_url)
