@@ -14,6 +14,7 @@ from markdown.util import etree, AtomicString
 
 BARELINK = r'(?<!">|=")(https?://[-\w./#?%=&:;@]+)'
 
+
 class LinkPattern(Pattern):
 
     def handleMatch(self, match):
