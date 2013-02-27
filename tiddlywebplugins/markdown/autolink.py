@@ -12,7 +12,7 @@ from markdown.inlinepatterns import Pattern
 from markdown import Extension
 from markdown.util import etree, AtomicString
 
-BARELINK = r'(?<!">|=")(https?://[-\w./#?%=&]+)'
+BARELINK = r'(?<!">|=")(https?://[-\w./#?%=&:;@]+)'
 
 class LinkPattern(Pattern):
 

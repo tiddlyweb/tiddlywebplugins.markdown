@@ -7,13 +7,18 @@ def test_urlification():
     tiddler.text = """
 lorem ipsum http://example.org dolor sit amet
 ... http://www.example.com/foo/bar ... and <http://example.com>
+don't forget about http://www.example.com/search?q=tag:hello or goodbye
+and you know this too http://example.com/tiddlers?select=tag:monkey;sort=-modified
+so much stuff! and http://example.com/tiddlers?q=tag:@cdent wow
      """
 
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
     output = render(tiddler, environ)
 
     for url in ["http://example.org", "http://www.example.com/foo/bar",
-            'http://example.com']:
+            'http://example.com', 'http://www.example.com/search?q=tag:hello',
+            'http://example.com/tiddlers?select=tag:monkey;sort=-modified',
+            'http://example.com/tiddlers?q=tag:@cdent']:
         assert '<a href="%(url)s">%(url)s</a>' % { "url": url } in output
 
 
