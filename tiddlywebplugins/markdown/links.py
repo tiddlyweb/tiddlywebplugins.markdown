@@ -1,3 +1,10 @@
+"""
+Makrdown extensions for freelinks and wikilinks, with
+optional @space handling.
+"""
+
+import re
+
 from markdown import util, inlinepatterns
 from markdown.extensions.wikilinks import (WikiLinkExtension,
         WikiLinks)
@@ -6,7 +13,7 @@ from tiddlyweb.web.util import encode_name
 
 FRONTBOUND = r'(?:^|(?<=[\s|\(]))'
 FREELINK = FRONTBOUND + r'\[\[(.+?)\]\]'
-WIKILINK = FRONTBOUND + r'([A-Z][a-z]+[A-Z]\w+\b)'
+WIKILINK = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
 
 SPACELINK_BASE = r'(@[0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'
 SPACELINK = FRONTBOUND + SPACELINK_BASE
@@ -103,6 +110,10 @@ class MarkdownLinks(WikiLinks):
             if '|' in matched_text:
                 label, target = matched_text.split('|', 1)
             else:
+                # short circuit escaping of ~WikiLink
+                if (re.match(WIKILINK, matched_text)
+                        and matched_text.startswith('~')):
+                    return matched_text[1:]
                 label = target = matched_text
             url = '%s%s%s' % (base_url, encode_name(target), end_url)
             a = util.etree.Element('a')

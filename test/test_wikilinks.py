@@ -8,6 +8,8 @@ This is WikiLink
 
 * List
 * List
+
+This is not ~WikiLink because we escaped it.
 """
 
 sample_linked = """
@@ -38,6 +40,7 @@ def test_no_wiki():
     assert 'href' in output
     assert '<a class="wikilink" href="WikiLink">' in output
     assert '>WikiLink</a>' in output
+    assert 'is not WikiLink because we escaped' in output
 
     tiddler.text = sample_linked
     output = render(tiddler, environ)
@@ -46,4 +49,3 @@ def test_no_wiki():
 
     assert '(<a class="wikilink" href="HtmlJavascript">HtmlJavascript</a> in parens)' in output
     assert '(parens around <a class="wikilink" href="HtmlJavascript">HtmlJavascript</a>)' in output
-
