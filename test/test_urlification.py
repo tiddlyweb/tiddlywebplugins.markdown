@@ -10,6 +10,7 @@ lorem ipsum http://example.org dolor sit amet
 don't forget about http://www.example.com/search?q=tag:hello or goodbye
 and you know this too http://example.com/tiddlers?select=tag:monkey;sort=-modified
 so much stuff! and http://example.com/tiddlers?q=tag:@cdent wow
+and how could we have forgotten http://example.com/~cdent of hyplan fame!
      """
 
     environ = {'tiddlyweb.config': {'markdown.wiki_link_base': ''}}
@@ -18,7 +19,8 @@ so much stuff! and http://example.com/tiddlers?q=tag:@cdent wow
     for url in ["http://example.org", "http://www.example.com/foo/bar",
             'http://example.com', 'http://www.example.com/search?q=tag:hello',
             'http://example.com/tiddlers?select=tag:monkey;sort=-modified',
-            'http://example.com/tiddlers?q=tag:@cdent']:
+            'http://example.com/tiddlers?q=tag:@cdent',
+            'http://example.com/~cdent']:
         assert '<a href="%(url)s">%(url)s</a>' % { "url": url } in output
 
 
