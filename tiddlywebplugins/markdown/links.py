@@ -1,5 +1,5 @@
 """
-Makrdown extensions for freelinks and wikilinks, with
+Markdown extensions for freelinks and wikilinks, with
 optional @space handling.
 """
 
