@@ -3,7 +3,7 @@ AUTHOR = 'Chris Dent'
 AUTHOR_EMAIL = 'cdent@peermore.com'
 NAME = 'tiddlywebplugins.markdown'
 DESCRIPTION = 'Markdown rendering for TiddlyWeb'
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 
 import os
 from setuptools import setup, find_packages
