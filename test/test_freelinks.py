@@ -106,3 +106,18 @@ def test_precedence_in_markdown_link():
     tiddler.text = 'I see [foo LoremIpsum bar](http://example.org) you'
     output = render(tiddler, environ)
     assert output == '<p>I see <a href="http://example.org">foo LoremIpsum bar</a> you</p>'
+
+def test_freelink_with_spacelink():
+    # a freelink followed by a spacelink will get confused
+    tiddler = Tiddler('Bar')
+    environ = { 'tiddlyweb.config': {
+        'markdown.wiki_link_base': '',
+        'server_host': {
+            'scheme': 'http',
+            'host': 'tiddlyspace.com',
+            'port': '80'
+            }
+        } }
+    tiddler.text = 'I see [[fire]] and [[rain]]@monkey business'
+    output = render(tiddler, environ)
+    assert '>fire<' in output

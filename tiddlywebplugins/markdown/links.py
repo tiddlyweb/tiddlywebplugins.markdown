@@ -12,13 +12,16 @@ from markdown.extensions.wikilinks import (WikiLinkExtension,
 from tiddlyweb.web.util import encode_name
 
 FRONTBOUND = r'(?:^|(?<=[\s|\(]))'
-FREELINK = FRONTBOUND + r'\[\[(.+?)\]\]'
-WIKILINK = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
+FREELINKB = FRONTBOUND + r'\[\[(.+?)\]\]'
+WIKILINKB = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
+
+FREELINK = FREELINKB + '(?!@)'
+WIKILINK = WIKILINKB + '(?!@)'
 
 SPACELINK_BASE = r'(@[0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'
 SPACELINK = FRONTBOUND + SPACELINK_BASE
-WIKISPACE = WIKILINK + SPACELINK_BASE
-FREESPACE = FREELINK + SPACELINK_BASE
+WIKISPACE = WIKILINKB + SPACELINK_BASE
+FREESPACE = FREELINKB + SPACELINK_BASE
 
 TIDDLYSPACE = False
 
@@ -44,6 +47,14 @@ class MarkdownLinksExtension(WikiLinkExtension):
     def extendMarkdown(self, md, md_globals):
         self.md = md
 
+        wikilinkPattern = MarkdownLinks(WIKILINK, self.getConfigs())
+        wikilinkPattern.md = md
+        md.inlinePatterns.add('wikilink', wikilinkPattern, '<link')
+
+        freelinkPattern = MarkdownLinks(FREELINK, self.getConfigs())
+        freelinkPattern.md = md
+        md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
+
         if TIDDLYSPACE:
             wikispacelinkPattern = SpaceLinks(WIKISPACE, self.getConfigs())
             wikispacelinkPattern.md = md
@@ -59,14 +70,6 @@ class MarkdownLinksExtension(WikiLinkExtension):
             spacelinkPattern.md = md
             md.inlinePatterns.add('spacelink', spacelinkPattern,
                     '>wikispacelink')
-
-        wikilinkPattern = MarkdownLinks(WIKILINK, self.getConfigs())
-        wikilinkPattern.md = md
-        md.inlinePatterns.add('wikilink', wikilinkPattern, '<link')
-
-        freelinkPattern = MarkdownLinks(FREELINK, self.getConfigs())
-        freelinkPattern.md = md
-        md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
 
 
 class SpaceLinks(inlinepatterns.Pattern):
