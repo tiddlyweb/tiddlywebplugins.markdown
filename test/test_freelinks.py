@@ -21,9 +21,7 @@ def test_simple_freelinks():
     environ = { 'tiddlyweb.config': { 'markdown.wiki_link_base': '' } }
     output = render(tiddler, environ)
 
-    assert '[[Foo [] Bar]]' not in output
-    assert '<a class="wikilink" href="Foo%20%5B%5D%20Bar">Foo [] Bar</a>' in output
-    assert output == '<p>lorem <a class="wikilink" href="Foo%20%5B%5D%20Bar">Foo [] Bar</a> ipsum</p>'
+    assert '[[Foo [] Bar]]' in output
 
 
 def test_spacing():
@@ -69,9 +67,7 @@ def test_labeled_freelinks():
     environ = { 'tiddlyweb.config': { 'markdown.wiki_link_base': '' } }
     output = render(tiddler, environ)
 
-    assert '[[hello [] world|Foo]]' not in output
-    assert '<a class="wikilink" href="Foo">hello [] world</a>' in output
-    assert output == '<p>lorem <a class="wikilink" href="Foo">hello [] world</a> ipsum</p>'
+    assert '[[hello [] world|Foo]]' in output
 
 
 def test_precedence():
@@ -140,5 +136,4 @@ def test_freelink_with_spacelink():
     output = render(tiddler, environ)
     assert '>fire<' in output
     assert 'href="fire"' in output
-    assert 'href="http://monkey.tiddlyspace/rain"' in output
-
+    assert 'href="http://monkey.tiddlyspace.com/rain"' in output

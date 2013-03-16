@@ -12,7 +12,7 @@ from markdown.extensions.wikilinks import (WikiLinkExtension,
 from tiddlyweb.web.util import encode_name
 
 FRONTBOUND = r'(?:^|(?<=[\s|\(]))'
-FREELINKB = FRONTBOUND + r'\[\[(.+?)\]\]'
+FREELINKB = FRONTBOUND + r'\[\[([^]]+?)\]\]'
 WIKILINKB = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
 
 FREELINK = FREELINKB + '(?!@)'
