@@ -137,3 +137,21 @@ def test_freelink_with_spacelink():
     assert '>fire<' in output
     assert 'href="fire"' in output
     assert 'href="http://monkey.tiddlyspace.com/rain"' in output
+
+
+def test_fragments():
+    tiddler = Tiddler('Foo')
+    tiddler.text = 'oh [[hi#cow]] bye'
+
+    environ = { 'tiddlyweb.config': { 'markdown.wiki_link_base': '' } }
+    output = render(tiddler, environ)
+
+    assert 'a class="wikilink" href="hi#cow">hi#cow</a>' in output
+
+    tiddler = Tiddler('Foo')
+    tiddler.text = 'oh [[what|hi#cow]] bye'
+
+    environ = { 'tiddlyweb.config': { 'markdown.wiki_link_base': '' } }
+    output = render(tiddler, environ)
+
+    assert 'a class="wikilink" href="hi#cow">what</a>' in output
