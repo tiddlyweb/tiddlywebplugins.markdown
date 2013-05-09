@@ -33,9 +33,9 @@ known[^inevitable].
     assert '<h1 id="oh-now">Oh Now</h1>' in output
 
     # check footnotes get in there
-    assert 'talked<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> about' in output
-    assert '<li id="fn:1">' in output
-    assert '<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a>' in output
+    assert 'talked<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup> about' in output
+    assert '<li id="fn-1">' in output
+    assert '<a class="footnote-backref" href="#fnref-1" title="Jump back to footnote 1 in the text">&#8617;</a>' in output
 
 @pytest.mark.xfail
 def test_footnote_linked():
