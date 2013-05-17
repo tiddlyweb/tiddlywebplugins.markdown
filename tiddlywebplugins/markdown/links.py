@@ -58,7 +58,7 @@ class MarkdownLinksExtension(WikiLinkExtension):
             wikispacelinkPattern = SpaceLinks(WIKISPACE, self.getConfigs())
             wikispacelinkPattern.md = md
             md.inlinePatterns.add('wikispacelink', wikispacelinkPattern,
-                    '<link')
+                    '<wikilink')
 
             freespacelinkPattern = SpaceLinks(FREESPACE, self.getConfigs())
             freespacelinkPattern.md = md
@@ -136,4 +136,3 @@ def encode_name(name):
     Like the encode_name found in tiddlyweb, but does not escape #.
     """
     return urllib.quote(name.encode('utf-8'), safe=".!~*'()#")
-
