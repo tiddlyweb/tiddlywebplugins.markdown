@@ -49,7 +49,7 @@ then set
  'wikitext.default_renderer': 'tiddlywebplugins.markdown'
 """
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 # for sake of making config calls clean, we import render
 # into this space
