@@ -89,6 +89,7 @@ def test_spacewiki_first():
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/WikiLink">WikiLink</a>' in output
 
+
 @pytest.mark.skipif('tiddlyspace == False')
 def test_spacefree_link():
     tiddler = Tiddler('test')
@@ -107,6 +108,7 @@ def test_spacefree_link():
     tiddler.text = "This is [[Free Link]]@cdent: lorem ipsum"
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
+
 
 @pytest.mark.skipif('tiddlyspace == False')
 def test_wiki_in_target():
