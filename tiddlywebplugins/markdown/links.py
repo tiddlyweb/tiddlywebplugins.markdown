@@ -45,27 +45,28 @@ class MarkdownLinksExtension(WikiLinkExtension):
 
     def extendMarkdown(self, md, md_globals):
         self.md = md
+        configs = self.getConfigs()
 
-        wikilinkPattern = MarkdownLinks(WIKILINK, self.getConfigs())
+        wikilinkPattern = MarkdownLinks(WIKILINK, configs)
         wikilinkPattern.md = md
         md.inlinePatterns.add('wikilink', wikilinkPattern, '<link')
 
-        freelinkPattern = MarkdownLinks(FREELINK, self.getConfigs())
+        freelinkPattern = MarkdownLinks(FREELINK, configs)
         freelinkPattern.md = md
         md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
 
         if TIDDLYSPACE:
-            wikispacelinkPattern = SpaceLinks(WIKISPACE, self.getConfigs())
+            wikispacelinkPattern = SpaceLinks(WIKISPACE, configs)
             wikispacelinkPattern.md = md
             md.inlinePatterns.add('wikispacelink', wikispacelinkPattern,
                     '<wikilink')
 
-            freespacelinkPattern = SpaceLinks(FREESPACE, self.getConfigs())
+            freespacelinkPattern = SpaceLinks(FREESPACE, configs)
             freespacelinkPattern.md = md
             md.inlinePatterns.add('freespacelink', freespacelinkPattern,
                     '<wikispacelink')
 
-            spacelinkPattern = SpaceLinks(SPACELINK, self.getConfigs())
+            spacelinkPattern = SpaceLinks(SPACELINK, configs)
             spacelinkPattern.md = md
             md.inlinePatterns.add('spacelink', spacelinkPattern,
                     '>wikispacelink')
