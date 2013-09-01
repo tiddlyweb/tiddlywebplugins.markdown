@@ -4,6 +4,9 @@ A [TiddlyWeb](http://tiddlyweb.com/) plugin to render markdown
 syntax wikitext to HTML using the
 [Python Markdown](https://github.com/waylan/Python-Markdown) library.
 
+The source repository is available
+[on GitHub](https://github.com/tiddlyweb/tiddlywebplugins.markdown).
+
 # Features
 
 If `markdown.wiki_link_base` is set in
