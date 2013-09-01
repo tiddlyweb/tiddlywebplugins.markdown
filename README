@@ -14,6 +14,10 @@ If `markdown.wiki_link_base` is set in
 TiddlyWeb oriented features are turned on (see below),
 otherwise the text is treated as straight Markdown.
 
+Additional Markdown extensions can be activated via the `markdown.extensions`
+configuration settings, which is a tuple of two items: A list of extension names
+and a dictionary with configuration settings.
+
 By default some extensions are included:
 
 * `fenced_code`: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html
