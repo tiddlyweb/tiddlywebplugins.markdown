@@ -6,9 +6,9 @@ from tiddlyweb.model.tiddler import Tiddler
 
 try:
     from tiddlywebplugins.tiddlyspace.spaces import space_uri
-    tiddlyspace = True
+    TIDDLYSPACE = True
 except ImportError:
-    tiddlyspace = False
+    TIDDLYSPACE = False
 
 
 environ = {
@@ -24,7 +24,7 @@ environ = {
 }
 
 
-@pytest.mark.skipif('tiddlyspace == False')
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_simple_spacelink():
     tiddler = Tiddler('test')
     tiddler.text = '# Hi\nVisit @cdent for more info.'
@@ -44,7 +44,7 @@ def test_escaped_spacelink():
     assert '@cdent' in output
 
 
-@pytest.mark.skipif('tiddlyspace == False')
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_bounded_spacelink():
     tiddler = Tiddler('test')
     tiddler.text = '# Hi\nVisit @cdent: for more info.'
@@ -55,7 +55,7 @@ def test_bounded_spacelink():
     assert '@cdent' in output
 
 
-@pytest.mark.skipif('tiddlyspace == False')
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_spacelink_first():
     tiddler = Tiddler('test')
     tiddler.text = '@cdent for more info.'
@@ -67,7 +67,7 @@ def test_spacelink_first():
     assert '<a href="http://cdent.tiddlyspace.org:8080/">@cdent</a>' in output
 
 
-@pytest.mark.skipif('tiddlyspace == False')
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_spacewiki_link():
     tiddler = Tiddler('test')
     tiddler.text = "This is WikiLink@cdent"
@@ -76,7 +76,7 @@ def test_spacewiki_link():
     assert 'This is <a' in output
 
 
-@pytest.mark.skipif('tiddlyspace == False')
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_spacewiki_first():
     tiddler = Tiddler('test')
     tiddler.text = "WikiLink@cdent"
@@ -91,7 +91,8 @@ def test_spacewiki_first():
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/WikiLink">WikiLink</a>' in output
 
-@pytest.mark.skipif('tiddlyspace == False')
+
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_spacefree_link():
     tiddler = Tiddler('test')
 
@@ -110,9 +111,48 @@ def test_spacefree_link():
     output = render(tiddler, environ)
     assert '<a href="http://cdent.tiddlyspace.org:8080/Free%20Link">Free Link</a>' in output
 
-@pytest.mark.skipif('tiddlyspace == False')
+
+@pytest.mark.skipif('TIDDLYSPACE == False')
 def test_wiki_in_target():
     tiddler = Tiddler('test')
     tiddler.text = "[[posting|TiddlySpace Server Rebuild]]@blog"
     output = render(tiddler, environ)
     assert 'TiddlySpace' in output
+
+
+@pytest.mark.skipif('TIDDLYSPACE == False')
+def test_freelink_with_spacelink():
+    # a freelink followed by a spacelink will get confused
+    tiddler = Tiddler('Bar')
+    environ = { 'tiddlyweb.config': {
+        'markdown.wiki_link_base': '',
+        'markdown.interlinker': space_uri,
+        'server_host': {
+            'scheme': 'http',
+            'host': 'tiddlyspace.com',
+            'port': '80'
+            }
+        } }
+    tiddler.text = 'I see [[fire]] and [[rain]] business'
+    output = render(tiddler, environ)
+    assert '>fire<' in output
+    assert '>rain<' in output
+    assert 'href="fire"' in output
+    assert 'href="rain"' in output
+
+    tiddler.text = 'I see [[fire]]@monkey and [[rain]]@monkey business'
+    output = render(tiddler, environ)
+    assert 'href="http://monkey.tiddlyspace.com/fire"' in output
+    assert 'href="http://monkey.tiddlyspace.com/rain"' in output
+
+    tiddler.text = 'I see [[fire]] and [[rain]]@monkey business'
+    output = render(tiddler, environ)
+    assert '>fire<' in output
+    assert 'href="fire"' in output
+    assert 'href="http://monkey.tiddlyspace' in output
+
+    tiddler.text = 'I see [[rain]]@monkey and [[fire]] business'
+    output = render(tiddler, environ)
+    assert '>fire<' in output
+    assert 'href="fire"' in output
+    assert 'href="http://monkey.tiddlyspace.com/rain"' in output

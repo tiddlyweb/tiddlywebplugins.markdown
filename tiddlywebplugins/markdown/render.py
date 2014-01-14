@@ -13,10 +13,16 @@ def render(tiddler, environ):
     """
     Render text in the provided tiddler to HTML.
     """
-    base = environ.get('tiddlyweb.config', {}).get('markdown.wiki_link_base')
-    extensions = ['headerid', 'footnotes', 'fenced_code', 'def_list']
+    config = environ.get('tiddlyweb.config', {})
+    base = config.get('markdown.wiki_link_base')
+    extra_extensions, extra_configs = config.get('markdown.extensions',
+            ([], {}))
+
+    extensions = ['headerid', 'footnotes', 'fenced_code', 'def_list',
+            'tiddlywebplugins.markdown.autolink'] + extra_extensions
     extension_configs = {}
-    extensions.append('tiddlywebplugins.markdown.autolink')
+    extension_configs.update(extra_configs)
+
     if base is not None:
         extensions.append('tiddlywebplugins.markdown.links')
         extensions.append('tiddlywebplugins.markdown.transclusion')
