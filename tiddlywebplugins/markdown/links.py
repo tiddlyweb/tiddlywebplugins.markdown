@@ -46,6 +46,8 @@ class MarkdownLinksExtension(WikiLinkExtension):
     def extendMarkdown(self, md, md_globals):
         self.md = md
         configs = self.getConfigs()
+        tiddlywebconfig = configs['environ'].get('tiddlyweb.config', {})
+        interlinker = tiddlywebconfig.get('markdown.interlinker', None)
 
         wikilinkPattern = MarkdownLinks(WIKILINK, configs)
         wikilinkPattern.md = md
@@ -55,7 +57,7 @@ class MarkdownLinksExtension(WikiLinkExtension):
         freelinkPattern.md = md
         md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
 
-        if TIDDLYSPACE:
+        if interlinker:
             wikispacelinkPattern = SpaceLinks(WIKISPACE, configs)
             wikispacelinkPattern.md = md
             md.inlinePatterns.add('wikispacelink', wikispacelinkPattern,
@@ -76,6 +78,8 @@ class SpaceLinks(inlinepatterns.Pattern):
     def __init__(self, pattern, config):
         inlinepatterns.Pattern.__init__(self, pattern)
         self.config = config
+        tiddlywebconfig = config['environ'].get('tiddlyweb.config', {})
+        self.interlinker = tiddlywebconfig.get('markdown.interlinker', None)
 
     def handleMatch(self, m):
         if m.lastindex == 4:  # we have a wikispacelink or freespace
@@ -89,7 +93,7 @@ class SpaceLinks(inlinepatterns.Pattern):
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(label)
                 space = space.lstrip('@')
-                a.set('href', space_uri(self.config['environ'], space)
+                a.set('href', self.interlinker(self.config['environ'], space)
                         + encode_name(target))
                 return a
         else:
@@ -98,7 +102,7 @@ class SpaceLinks(inlinepatterns.Pattern):
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(matched_text)
                 space = a.text.lstrip('@')
-                a.set('href', space_uri(self.config['environ'], space))
+                a.set('href', self.interlinker(self.config['environ'], space))
                 return a
         return ''
 

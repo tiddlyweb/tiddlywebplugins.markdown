@@ -105,6 +105,12 @@ def test_double_render_transclude():
 
 @pytest.mark.skipif('tiddlyspace == False')
 def test_space_include():
+    from tiddlywebplugins.markdown.transclusion import tiddlyspace_target_resolver
+    from tiddlywebplugins.tiddlyspace.fixups import web_tiddler_url as tu
+    def tiddler_url(environ, tiddler):
+        return tu(environ, tiddler, friendly=True)
+    environ['tiddlyweb.config']['markdown.transclude_url'] = tiddler_url
+    environ['tiddlyweb.config']['markdown.target_resolver'] = tiddlyspace_target_resolver
     tiddlerB.text = '''
 Hey There
 

@@ -105,6 +105,7 @@ def test_precedence_in_markdown_link():
 
 def test_freelink_with_spacelink():
     # a freelink followed by a spacelink will get confused
+    from tiddlywebplugins.tiddlyspace.spaces import space_uri
     tiddler = Tiddler('Bar')
     environ = { 'tiddlyweb.config': {
         'markdown.wiki_link_base': '',
@@ -112,7 +113,8 @@ def test_freelink_with_spacelink():
             'scheme': 'http',
             'host': 'tiddlyspace.com',
             'port': '80'
-            }
+            },
+        'markdown.interlinker': space_uri,
         } }
     tiddler.text = 'I see [[fire]] and [[rain]] business'
     output = render(tiddler, environ)
