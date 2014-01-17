@@ -14,17 +14,11 @@ from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.policy import PermissionsError
 from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
+from tiddlyweb.web.util import tiddler_url
 from tiddlyweb.wikitext import render_wikitext
 
-TIDDLYSPACE = False
-try:
-    from tiddlywebplugins.tiddlyspace.fixups \
-            import web_tiddler_url as tiddler_url
-    TRANSCLUDE_RE = r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>'
-    TIDDLYSPACE = True
-except ImportError:
-    from tiddlyweb.web.util import tiddler_url
-    TRANSCLUDE_RE = re.compile(r'<p>{{([^}]+)}}</p>')
+
+TRANSCLUDE_RE = r'<p>{{([^}]+)}}(?:@([0-9a-z][0-9a-z\-]*[0-9a-z]))?</p>'
 
 
 def get_bag_from_recipe(environ, recipe_name, tiddler):
@@ -42,6 +36,20 @@ def get_bag_from_recipe(environ, recipe_name, tiddler):
     return bag
 
 
+# XXX: This should be moved to the tiddlyspace code repo at some
+# point.
+def tiddlyspace_target_resolver(environ, space, interior_tiddler):
+    """
+    Given a transclusion target that names a space, determine the
+    bag and recipe of the target tiddler.
+    """
+    space_recipe = '%s_public' % space
+    interior_bag = get_bag_from_recipe(environ, space_recipe,
+            interior_tiddler)
+    interior_tiddler.bag = interior_bag.name
+    interior_tiddler.recipe = space_recipe
+
+
 class TranscludeProcessor(Postprocessor):
 
     def __init__(self, pattern, config):
@@ -53,15 +61,11 @@ class TranscludeProcessor(Postprocessor):
         self.transclude_stack = {}
 
     def transcluder(self, match):
-        space_recipe = None
         interior_title = match.group(1)
         try:
-            space = match.group(2)
+            target = match.group(2)
         except IndexError:
-            space = None
-
-        if space:
-            space_recipe = '%s_public' % space
+            target = None
 
         # bail out if we are looping
         if interior_title in self.transclude_stack:
@@ -71,26 +75,15 @@ class TranscludeProcessor(Postprocessor):
         if not self.store:
             return match.group(0)
 
+        interior_tiddler = self.resolve_tiddler(target, interior_title)
+
         try:
             self.transclude_stack[self.tiddler.title].append(
                     interior_title)
         except KeyError:
             self.transclude_stack[self.tiddler.title] = [interior_title]
 
-        interior_tiddler = Tiddler(interior_title)
         try:
-            if space_recipe:
-                interior_bag = get_bag_from_recipe(self.environ,
-                        space_recipe, interior_tiddler)
-                interior_tiddler.bag = interior_bag.name
-                interior_tiddler.recipe = space_recipe
-            else:
-                if self.tiddler.recipe:
-                    interior_bag = get_bag_from_recipe(self.environ,
-                            self.tiddler.recipe, interior_tiddler)
-                    interior_tiddler.bag = interior_bag.name
-                else:
-                    interior_tiddler.bag = self.tiddler.bag
             interior_tiddler = self.store.get(interior_tiddler)
         except (StoreError, KeyError, PermissionsError):
             return match.group(0)
@@ -105,11 +98,29 @@ class TranscludeProcessor(Postprocessor):
                         interior_tiddler.title,
                         interior_tiddler.bag, content)
 
-    def interior_url(self, tiddler):
-        if TIDDLYSPACE:
-            return tiddler_url(self.environ, tiddler, friendly=True)
+    def resolve_tiddler(self, target, title):
+        interior_tiddler = Tiddler(title)
+        if target:
+            tiddlywebconfig = self.environ['tiddlyweb.config']
+            target_resolver = tiddlywebconfig.get('markdown.target_resolver')
+            if not target_resolver:
+                interior_tiddler.bag = 'NoSuchBag'
+            else:
+                target_resolver(self.environ, target, interior_tiddler)
         else:
-            return tiddler_url(self.environ, tiddler)
+            if self.tiddler.recipe:
+                interior_bag = get_bag_from_recipe(self.environ,
+                        self.tiddler.recipe, interior_tiddler)
+                interior_tiddler.bag = interior_bag.name
+            else:
+                interior_tiddler.bag = self.tiddler.bag
+        return interior_tiddler
+
+    def interior_url(self, tiddler):
+        tiddlywebconfig = self.environ['tiddlyweb.config']
+        interior_tiddler_url = tiddlywebconfig.get(
+            'markdown.transclude_url', tiddler_url)
+        return interior_tiddler_url(self.environ, tiddler)
 
     def run(self, text):
         return re.sub(self.pattern, self.transcluder, text)

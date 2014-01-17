@@ -1,6 +1,6 @@
 """
 Markdown extensions for freelinks and wikilinks, with
-optional @space handling.
+optional @target handling.
 """
 
 import re
@@ -17,18 +17,10 @@ WIKILINKB = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
 FREELINK = FREELINKB + '(?!@)'
 WIKILINK = WIKILINKB + '(?!@)'
 
-SPACELINK_BASE = r'(@[0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'
-SPACELINK = FRONTBOUND + SPACELINK_BASE
-WIKISPACE = WIKILINKB + SPACELINK_BASE
-FREESPACE = FREELINKB + SPACELINK_BASE
-
-TIDDLYSPACE = False
-
-try:
-    from tiddlywebplugins.tiddlyspace.spaces import space_uri
-    TIDDLYSPACE = True
-except ImportError:
-    pass
+TARGETLINK_BASE = r'(@[0-9a-z][0-9a-z\-]*[0-9a-z])(?:\b|$)'
+TARGETLINK = FRONTBOUND + TARGETLINK_BASE
+WIKITARGET = WIKILINKB + TARGETLINK_BASE
+FREETARGET = FREELINKB + TARGETLINK_BASE
 
 
 class MarkdownLinksExtension(WikiLinkExtension):
@@ -46,6 +38,8 @@ class MarkdownLinksExtension(WikiLinkExtension):
     def extendMarkdown(self, md, md_globals):
         self.md = md
         configs = self.getConfigs()
+        tiddlywebconfig = configs['environ'].get('tiddlyweb.config', {})
+        interlinker = tiddlywebconfig.get('markdown.interlinker', None)
 
         wikilinkPattern = MarkdownLinks(WIKILINK, configs)
         wikilinkPattern.md = md
@@ -55,50 +49,52 @@ class MarkdownLinksExtension(WikiLinkExtension):
         freelinkPattern.md = md
         md.inlinePatterns.add('freelink', freelinkPattern, '<wikilink')
 
-        if TIDDLYSPACE:
-            wikispacelinkPattern = SpaceLinks(WIKISPACE, configs)
-            wikispacelinkPattern.md = md
-            md.inlinePatterns.add('wikispacelink', wikispacelinkPattern,
+        if interlinker:
+            wikitargetlinkPattern = TargetLinks(WIKITARGET, configs)
+            wikitargetlinkPattern.md = md
+            md.inlinePatterns.add('wikitargetlink', wikitargetlinkPattern,
                     '<wikilink')
 
-            freespacelinkPattern = SpaceLinks(FREESPACE, configs)
-            freespacelinkPattern.md = md
-            md.inlinePatterns.add('freespacelink', freespacelinkPattern,
-                    '<wikispacelink')
+            freetargetlinkPattern = TargetLinks(FREETARGET, configs)
+            freetargetlinkPattern.md = md
+            md.inlinePatterns.add('freetargetlink', freetargetlinkPattern,
+                    '<wikitargetlink')
 
-            spacelinkPattern = SpaceLinks(SPACELINK, configs)
-            spacelinkPattern.md = md
-            md.inlinePatterns.add('spacelink', spacelinkPattern,
-                    '>wikispacelink')
+            targetlinkPattern = TargetLinks(TARGETLINK, configs)
+            targetlinkPattern.md = md
+            md.inlinePatterns.add('targetlink', targetlinkPattern,
+                    '>wikitargetlink')
 
 
-class SpaceLinks(inlinepatterns.Pattern):
+class TargetLinks(inlinepatterns.Pattern):
     def __init__(self, pattern, config):
         inlinepatterns.Pattern.__init__(self, pattern)
         self.config = config
+        tiddlywebconfig = config['environ'].get('tiddlyweb.config', {})
+        self.interlinker = tiddlywebconfig.get('markdown.interlinker', None)
 
     def handleMatch(self, m):
-        if m.lastindex == 4:  # we have a wikispacelink or freespace
+        if m.lastindex == 4:  # we have a wikitargetlink or freetarget
             page = m.group(2)
-            space = m.group(3)
-            if page and space:
+            target = m.group(3)
+            if page and target:
                 if '|' in page:
-                    label, target = page.split('|', 1)
+                    label, destination = page.split('|', 1)
                 else:
-                    label = target = page
+                    label = destination = page
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(label)
-                space = space.lstrip('@')
-                a.set('href', space_uri(self.config['environ'], space)
-                        + encode_name(target))
+                target = target.lstrip('@')
+                a.set('href', self.interlinker(self.config['environ'], target)
+                        + encode_name(destination))
                 return a
         else:
             matched_text = m.group(2)
             if matched_text:
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(matched_text)
-                space = a.text.lstrip('@')
-                a.set('href', space_uri(self.config['environ'], space))
+                target = a.text.lstrip('@')
+                a.set('href', self.interlinker(self.config['environ'], target))
                 return a
         return ''
 

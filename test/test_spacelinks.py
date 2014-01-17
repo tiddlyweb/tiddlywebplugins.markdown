@@ -4,6 +4,13 @@ from tiddlywebplugins.markdown import render
 from tiddlyweb.model.tiddler import Tiddler
 
 
+try:
+    from tiddlywebplugins.tiddlyspace.spaces import space_uri
+    TIDDLYSPACE = True
+except ImportError:
+    TIDDLYSPACE = False
+
+
 environ = {
     'tiddlyweb.config': {
         'markdown.wiki_link_base': '',
@@ -11,15 +18,10 @@ environ = {
             'host': 'tiddlyspace.org',
             'port': '8080',
             'scheme': 'http',
-        }
+        },
+        'markdown.interlinker': space_uri
     }
 }
-
-try:
-    import tiddlywebplugins.tiddlyspace
-    TIDDLYSPACE = True
-except ImportError:
-    TIDDLYSPACE = False
 
 
 @pytest.mark.skipif('TIDDLYSPACE == False')
@@ -124,6 +126,7 @@ def test_freelink_with_spacelink():
     tiddler = Tiddler('Bar')
     environ = { 'tiddlyweb.config': {
         'markdown.wiki_link_base': '',
+        'markdown.interlinker': space_uri,
         'server_host': {
             'scheme': 'http',
             'host': 'tiddlyspace.com',
