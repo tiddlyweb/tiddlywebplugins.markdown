@@ -36,7 +36,13 @@ def get_bag_from_recipe(environ, recipe_name, tiddler):
     return bag
 
 
+# XXX: This should be moved to the tiddlyspace code repo at some
+# point.
 def tiddlyspace_target_resolver(environ, space, interior_tiddler):
+    """
+    Given a transclusion target that names a space, determine the
+    bag and recipe of the target tiddler.
+    """
     space_recipe = '%s_public' % space
     interior_bag = get_bag_from_recipe(environ, space_recipe,
             interior_tiddler)
