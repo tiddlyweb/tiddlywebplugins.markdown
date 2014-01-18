@@ -85,8 +85,10 @@ class TargetLinks(inlinepatterns.Pattern):
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(label)
                 target = target.lstrip('@')
-                a.set('href', self.interlinker(self.config['environ'], target)
-                        + encode_name(destination))
+                target_base = self.interlinker(self.config['environ'], target)
+                if not target_base.endswith('/'):
+                    target_base = target_base + '/'
+                a.set('href', target_base + encode_name(destination))
                 return a
         else:
             matched_text = m.group(2)
@@ -127,6 +129,7 @@ class MarkdownLinks(WikiLinks):
 
 def makeExtension(configs=None):
     return MarkdownLinksExtension(configs=configs)
+
 
 def encode_name(name):
     """

@@ -75,8 +75,6 @@ class TranscludeProcessor(Postprocessor):
         if not self.store:
             return match.group(0)
 
-        interior_tiddler = self.resolve_tiddler(target, interior_title)
-
         try:
             self.transclude_stack[self.tiddler.title].append(
                     interior_title)
@@ -84,6 +82,7 @@ class TranscludeProcessor(Postprocessor):
             self.transclude_stack[self.tiddler.title] = [interior_title]
 
         try:
+            interior_tiddler = self.resolve_tiddler(target, interior_title)
             interior_tiddler = self.store.get(interior_tiddler)
         except (StoreError, KeyError, PermissionsError):
             return match.group(0)
