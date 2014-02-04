@@ -116,7 +116,9 @@ Hey There
 
 {{tiddler a}}@recipe
 
-We called that from outside, yo
+We called that from outside, yo, and we'll call it again.
+
+{{tiddler a}}@recipe
 '''
 
     output = render(tiddlerB, environ)

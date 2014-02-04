@@ -58,28 +58,22 @@ class TranscludeProcessor(Postprocessor):
         self.environ = config['environ']
         self.tiddler = config['tiddler']
         self.store = self.environ.get('tiddlyweb.store')
-        self.transclude_stack = {}
 
     def transcluder(self, match):
+        if 'markdown.transclusions' in self.environ:
+            seen_titles = self.environ['markdown.transclusions']
+        else:
+            seen_titles = []
+
         interior_title = match.group(1)
         try:
             target = match.group(2)
         except IndexError:
             target = None
 
-        # bail out if we are looping
-        if interior_title in self.transclude_stack:
-            return match.group(0)
-
         # bail out if we have no store
         if not self.store:
             return match.group(0)
-
-        try:
-            self.transclude_stack[self.tiddler.title].append(
-                    interior_title)
-        except KeyError:
-            self.transclude_stack[self.tiddler.title] = [interior_title]
 
         try:
             interior_tiddler = self.resolve_tiddler(target, interior_title)
@@ -87,15 +81,24 @@ class TranscludeProcessor(Postprocessor):
         except (StoreError, KeyError, PermissionsError):
             return match.group(0)
 
-        if renderable(interior_tiddler, self.environ):
-            content = render_wikitext(interior_tiddler, self.environ)
+        semaphore_title = '%s:%s' % (interior_tiddler.bag,
+                interior_tiddler.title)
+
+        if semaphore_title not in seen_titles:
+            seen_titles.append(semaphore_title)
+            self.environ['markdown.transclusions'] = seen_titles
+            if renderable(interior_tiddler, self.environ):
+                content = render_wikitext(interior_tiddler, self.environ)
+            else:
+                content = ''
+            seen_titles.pop()
+            return '<article class="transclusion" data-uri="%s" ' \
+                    'data-title="%s" data-bag="%s">%s</article>' % (
+                            self.interior_url(interior_tiddler),
+                            interior_tiddler.title,
+                            interior_tiddler.bag, content)
         else:
-            content = ''
-        return '<article class="transclusion" data-uri="%s" ' \
-                'data-title="%s" data-bag="%s">%s</article>' % (
-                        self.interior_url(interior_tiddler),
-                        interior_tiddler.title,
-                        interior_tiddler.bag, content)
+            return match.group(0)
 
     def resolve_tiddler(self, target, title):
         interior_tiddler = Tiddler(title)
