@@ -73,7 +73,7 @@ as markdown, then configure:
  'wikitext.default_renderer': 'tiddlywebplugins.markdown'
 """
 
-__version__ = '1.2.1'
+__version__ = '1.2.2'
 
 # for sake of making config calls clean, we import render
 # into this space
