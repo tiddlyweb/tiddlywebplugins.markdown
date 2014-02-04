@@ -4,11 +4,12 @@ optional @target handling.
 """
 
 import re
-import urllib
 
 from markdown import util, inlinepatterns
 from markdown.extensions.wikilinks import (WikiLinkExtension,
         WikiLinks)
+from tiddlyweb.fixups import quote
+
 
 FRONTBOUND = r'(?:^|(?<=[\s|\(]))'
 FREELINKB = FRONTBOUND + r'\[\[([^]]+?)\]\]'
@@ -135,4 +136,4 @@ def encode_name(name):
     """
     Like the encode_name found in tiddlyweb, but does not escape #.
     """
-    return urllib.quote(name.encode('utf-8'), safe=".!~*'()#")
+    return quote(name.encode('utf-8'), safe=".!~*'()#")
