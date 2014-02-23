@@ -9,14 +9,22 @@ tiddlywebconfig.py).
 import markdown
 
 
+ALLOWED_SAFE_MODES = [False, 'replace', 'remove', 'escape']
+DEFAULT_SAFE_MODE = 'escape'
+
+
 def render(tiddler, environ):
     """
     Render text in the provided tiddler to HTML.
     """
     config = environ.get('tiddlyweb.config', {})
     base = config.get('markdown.wiki_link_base')
+    safe = config.get('markdown.safe_mode', DEFAULT_SAFE_MODE)
     extra_extensions, extra_configs = config.get('markdown.extensions',
             ([], {}))
+
+    if safe not in ALLOWED_SAFE_MODES:
+        safe = DEFAULT_SAFE_MODE
 
     extensions = ['headerid', 'footnotes', 'fenced_code', 'def_list',
             'tiddlywebplugins.markdown.autolink'] + extra_extensions
@@ -34,4 +42,5 @@ def render(tiddler, environ):
     return markdown.markdown(tiddler.text,
             extensions=extensions,
             extension_configs=extension_configs,
-            output_format='html5')
+            output_format='html5',
+            safe_mode=safe)

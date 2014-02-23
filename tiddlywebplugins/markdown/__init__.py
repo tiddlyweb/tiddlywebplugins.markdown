@@ -6,6 +6,12 @@ If 'markdown.wiki_link_base' is set in config, then
 TiddlyWeb oriented features are turned on (see below),
 otherwise the text is treated as straight Markdown.
 
+By default HTML in user input is escaped. If different behavior
+is desired set `markdown.safe_mode` in config to one of the values
+described in the [Python-Markdown
+documentation](http://pythonhosted.org/Markdown/reference.html#safe_mode):
+"replace", "escape", "remove" of `False`.
+
 By default some extensions are included:
 
 fenced_code: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html
