@@ -6,6 +6,7 @@ from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.config import config
+from tiddlyweb.web.util import tiddler_url
 
 from tiddlywebplugins.utils import get_store
 
@@ -56,6 +57,7 @@ def setup_module(module):
 
     tiddlerA = Tiddler('tiddler a', 'bag_public')
     tiddlerA.text = 'I am _tiddler_'
+    tiddlerA.type = 'text/x-markdown'
     store.put(tiddlerA)
 
     tiddlerB = Tiddler('tiddler b')
@@ -78,7 +80,7 @@ And I wish too.
 def test_no_bag():
     output = render(tiddlerB, environ)
 
-    assert 'I am _tiddler_' not in output
+    assert 'I am <em>tiddler</em>' not in output
     assert 'You wish' in output
 
 
@@ -86,7 +88,7 @@ def test_recipe():
     tiddlerB.recipe = 'recipe_public'
     output = render(tiddlerB, environ)
 
-    assert 'I am _tiddler_' in output
+    assert 'I am <em>tiddler</em>' in output
     assert 'You wish' in output
 
 
@@ -94,7 +96,7 @@ def test_bag():
     output = render(tiddlerB, environ)
     tiddlerB.bag = 'bag_public'
 
-    assert 'I am _tiddler_' in output
+    assert 'I am <em>tiddler</em>' in output
     assert 'You wish' in output
 
 
@@ -107,6 +109,32 @@ def test_double_render_transclude():
 
     assert 'I am <em>tiddler</em>' in output
     assert 'You wish' in output
+
+
+def test_spaced_target_include():
+    def target_resolver(environ, target, interior_tiddler):
+        interior_tiddler.bag = target
+    environ['tiddlyweb.config']['markdown.transclude_url'] = tiddler_url
+    environ['tiddlyweb.config']['markdown.target_resolver'] = target_resolver
+    tiddlerB.text = '''
+Hey There
+
+{{tiddler x}}@[[spaced bag]]
+
+We called that from outside, yo, and we'll call it again.
+
+{{tiddler x}}@[[spaced bag]]
+
+{{tiddler a}}@bag_public
+'''
+
+    output = render(tiddlerB, environ)
+
+# Note: the URI here is funkity because of the above config settings
+    assert '<article class="transclusion" data-uri="http://tiddlyspace.com/bags/spaced%20bag/tiddlers/tiddler%20x" data-title="tiddler x" ' \
+            'data-bag="spaced bag"><p>X is not Y</p></article>' in output
+    assert 'We called that from outside,' in output
+    assert 'I am <em>tiddler</em>' in output
 
 
 @pytest.mark.skipif('tiddlyspace == False')
@@ -132,30 +160,4 @@ We called that from outside, yo, and we'll call it again.
 # Note: the URI here is funkity because of the above config settings
     assert '<article class="transclusion" data-uri="http://bag.tiddlyspace.com/tiddler%20a" data-title="tiddler a" ' \
             'data-bag="bag_public"><p>I am <em>tiddler</em></p></article>' in output
-    assert 'We called that from outside,' in output
-
-
-def test_spaced_target_include():
-    from tiddlywebplugins.tiddlyspace.fixups import web_tiddler_url as tu
-    def tiddler_url(environ, tiddler):
-        return tu(environ, tiddler, friendly=True)
-    def target_resolver(environ, target, interior_tiddler):
-        interior_tiddler.bag = target
-    environ['tiddlyweb.config']['markdown.transclude_url'] = tiddler_url
-    environ['tiddlyweb.config']['markdown.target_resolver'] = target_resolver
-    tiddlerB.text = '''
-Hey There
-
-{{tiddler x}}@[[spaced bag]]
-
-We called that from outside, yo, and we'll call it again.
-
-{{tiddler x}}@[[spaced bag]]
-'''
-
-    output = render(tiddlerB, environ)
-
-# Note: the URI here is funkity because of the above config settings
-    assert '<article class="transclusion" data-uri="http://tiddlyspace.com/bags/spaced%20bag/tiddlers/tiddler%20x" data-title="tiddler x" ' \
-            'data-bag="spaced bag"><p>X is not Y</p></article>' in output
     assert 'We called that from outside,' in output

@@ -21,7 +21,7 @@ from .links import FREELINKRAW
 
 
 TRANSCLUDE_RE = (r'<p>{{([^}]+)}}(?:@(?:' + FREELINKRAW +
-    r'|([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])))?</p>')
+    r'|([0-9A-Za-z][0-9A-Za-z\-_]*[0-9A-Za-z])))?</p>')
 
 
 def get_bag_from_recipe(environ, recipe_name, tiddler):
@@ -70,7 +70,7 @@ class TranscludeProcessor(Postprocessor):
 
         interior_title = match.group(1)
         try:
-            target = match.group(2)
+            target = match.group(2) or match.group(3)
         except IndexError:
             target = None
 
