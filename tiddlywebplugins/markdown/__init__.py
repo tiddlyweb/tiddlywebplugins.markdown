@@ -66,6 +66,11 @@ Links and transclusion can be augmented with @target syntax:
    that has been transcluded. This is useful for augmenting the
    output to include a link to the transcluded tiddler.
 
+If the desired target contains spaces, wrap the target in [[ ]], for
+example:
+
+    [[my page]]@[[my bag]]
+
 To use this renderer on Tiddlers which have a type of
 'text/x-markdown' adjust tiddlywebconfig.py to include:
 
@@ -79,7 +84,7 @@ as markdown, then configure:
  'wikitext.default_renderer': 'tiddlywebplugins.markdown'
 """
 
-__version__ = '1.2.4'
+__version__ = '1.2.5'
 
 # for sake of making config calls clean, we import render
 # into this space

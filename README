@@ -79,6 +79,11 @@ Links and transclusion can be augmented with `@target` syntax:
    that has been transcluded. This is useful for augmenting the
    output to include a link to the transcluded tiddler.
 
+If the desired target contains spaces, wrap the target in [[ ]], for
+example:
+
+    [[my page]]@[[my bag]]
+
 To use this renderer on Tiddlers which have a type of
 `text/x-markdown` adjust
 [tiddlywebconfig.py](http://tiddlyweb.tiddlyspace.com/tiddlywebconfig.py)
