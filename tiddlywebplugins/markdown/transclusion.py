@@ -17,8 +17,11 @@ from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.web.util import tiddler_url
 from tiddlyweb.wikitext import render_wikitext
 
+from .links import FREELINKRAW
 
-TRANSCLUDE_RE = r'<p>{{([^}]+)}}(?:@([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z]))?</p>'
+
+TRANSCLUDE_RE = (r'<p>{{([^}]+)}}(?:@(?:' + FREELINKRAW +
+    r'|([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])))?</p>')
 
 
 def get_bag_from_recipe(environ, recipe_name, tiddler):

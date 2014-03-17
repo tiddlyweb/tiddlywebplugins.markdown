@@ -66,7 +66,7 @@ Links and transclusion can be augmented with `@target` syntax:
    target. It returns a URI for the target, without the title
    of the tiddler.
 
-* `markdown.target_resolver` names a function which determinesh
+* `markdown.target_resolver` names a function which determines
    the tiddler object that is to be transcluded. It's arguments
    are a WSGI environ, a string representing the context from
    which a tiddler is being transcluded and a tiddler object.

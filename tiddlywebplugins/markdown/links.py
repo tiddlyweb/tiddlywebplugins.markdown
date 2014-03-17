@@ -12,13 +12,16 @@ from tiddlyweb.fixups import quote
 
 
 FRONTBOUND = r'(?:^|(?<=[\s|\(]))'
-FREELINKB = FRONTBOUND + r'\[\[([^]]+?)\]\]'
+FREELINKRAW = r'\[\[([^]]+?)\]\]'
+#FREELINKRAW = r'\[\[[^]]+?\]\]'
+FREELINKB = FRONTBOUND + FREELINKRAW
 WIKILINKB = FRONTBOUND + r'(~?[A-Z][a-z]+[A-Z]\w+\b)'
 
 FREELINK = FREELINKB + '(?!@)'
 WIKILINK = WIKILINKB + '(?!@)'
 
-TARGETLINK_BASE = r'(@[0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])(?:\b|$)'
+TARGETLINK_BASE = (r'(@(?:' + FREELINKRAW +
+    r'|([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])))(?:\b|$)')
 TARGETLINK = FRONTBOUND + TARGETLINK_BASE
 WIKITARGET = WIKILINKB + TARGETLINK_BASE
 FREETARGET = FREELINKB + TARGETLINK_BASE
@@ -75,7 +78,7 @@ class TargetLinks(inlinepatterns.Pattern):
         self.interlinker = tiddlywebconfig.get('markdown.interlinker', None)
 
     def handleMatch(self, m):
-        if m.lastindex == 4:  # we have a wikitargetlink or freetarget
+        if m.lastindex == 6:  # we have a wikitargetlink or freetarget
             page = m.group(2)
             target = m.group(3)
             if page and target:
@@ -85,7 +88,9 @@ class TargetLinks(inlinepatterns.Pattern):
                     label = destination = page
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(label)
-                target = target.lstrip('@')
+                # Target regexp returns a different group depending on
+                # the match.
+                target = m.group(5) or m.group(4)
                 target_base = self.interlinker(self.config['environ'], target)
                 if not target_base.endswith('/'):
                     target_base = target_base + '/'
@@ -96,7 +101,7 @@ class TargetLinks(inlinepatterns.Pattern):
             if matched_text:
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(matched_text)
-                target = a.text.lstrip('@')
+                target = m.group(4)
                 a.set('href', self.interlinker(self.config['environ'], target))
                 return a
         return ''

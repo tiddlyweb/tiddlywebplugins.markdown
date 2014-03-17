@@ -2,6 +2,7 @@ import pytest
 
 from tiddlywebplugins.markdown import render
 from tiddlyweb.model.tiddler import Tiddler
+from tiddlyweb.web.util import server_base_url, encode_name
 
 
 try:
@@ -22,6 +23,13 @@ environ = {
         'markdown.interlinker': space_uri
     }
 }
+
+
+def tank_uri(environ, tank_name, slash=False):
+    """
+    Create a redirect URI for a given tank.
+    """
+    return server_base_url(environ) + '/tanks/%s' % encode_name(tank_name)
 
 
 @pytest.mark.skipif('TIDDLYSPACE == False')
@@ -156,3 +164,26 @@ def test_freelink_with_spacelink():
     assert '>fire<' in output
     assert 'href="fire"' in output
     assert 'href="http://monkey.tiddlyspace.com/rain"' in output
+
+
+def test_spaced_target():
+    tiddler = Tiddler('Bar')
+    environ = {
+        'tiddlyweb.config': {
+            'markdown.wiki_link_base': '',
+            'markdown.interlinker': tank_uri,
+            'server_host': {
+                'scheme': 'http',
+                'host': 'tiddlyspace.com',
+                'port': '80'
+            }
+        }
+    }
+    tiddler.text = 'I see [[cow fire]]@[[monkey business]]'
+    output = render(tiddler, environ)
+    assert '>cow fire<' in output
+    assert 'href="http://tiddlyspace.com/tanks/monkey%20business/cow%20fire"' in output
+    tiddler.text = 'I see [[fire]]@[[monkey business]]'
+    output = render(tiddler, environ)
+    assert '>fire<' in output
+    assert 'href="http://tiddlyspace.com/tanks/monkey%20business/fire"' in output
