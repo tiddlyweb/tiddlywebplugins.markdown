@@ -21,7 +21,7 @@ FREELINK = FREELINKB + '(?!@)'
 WIKILINK = WIKILINKB + '(?!@)'
 
 TARGETLINK_BASE = (r'(@(?:' + FREELINKRAW +
-    r'|([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])))(?:\b|$|[^]])')
+    r'|([0-9A-Za-z][0-9A-Za-z\-]*[0-9A-Za-z])))(?=\b|$|[^]])')
 TARGETLINK = FRONTBOUND + TARGETLINK_BASE
 WIKITARGET = WIKILINKB + TARGETLINK_BASE
 FREETARGET = FREELINKB + TARGETLINK_BASE
