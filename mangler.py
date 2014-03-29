@@ -1,12 +1,17 @@
 """
-adjusts module path to account for virtual namespace
+Adjusts module path to account for virtual namespace/namespace packages.
 
 This is required primarily for testing.
+
+The new setuptools allows implicit namespace packages so in order for us
+to manipulate the paths associated with the namespace we need to load a
+namespace first. Without it, a KeyError happens.
 """
 
 import sys
 import os
 
+# Cause namespace to exist.
 import tiddlywebplugins.utils
 
 
