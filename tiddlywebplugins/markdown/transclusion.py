@@ -14,7 +14,7 @@ from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.policy import PermissionsError
 from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
-from tiddlyweb.web.util import tiddler_url
+from tiddlyweb.web.util import tiddler_url, encode_name
 from tiddlyweb.wikitext import render_wikitext
 
 from .links import FREELINKRAW
@@ -95,8 +95,9 @@ class TranscludeProcessor(Postprocessor):
             else:
                 content = ''
             seen_titles.pop()
-            return '<article class="transclusion" data-uri="%s" ' \
+            return '<article id="%s" class="transclusion" data-uri="%s" ' \
                     'data-title="%s" data-bag="%s">%s</article>' % (
+                            self._make_id(interior_tiddler),
                             self.interior_url(interior_tiddler),
                             interior_tiddler.title,
                             interior_tiddler.bag, content)
@@ -129,6 +130,12 @@ class TranscludeProcessor(Postprocessor):
 
     def run(self, text):
         return re.sub(self.pattern, self.transcluder, text)
+
+    def _make_id(self, tiddler):
+        """
+        Make an id for the transcluded article.
+        """
+        return 't-%s' % encode_name(tiddler.title.lower().replace(' ', '-'))
 
 
 class TransclusionExtension(Extension):

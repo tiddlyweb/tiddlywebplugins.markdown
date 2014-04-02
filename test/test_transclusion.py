@@ -131,7 +131,7 @@ We called that from outside, yo, and we'll call it again.
     output = render(tiddlerB, environ)
 
 # Note: the URI here is funkity because of the above config settings
-    assert '<article class="transclusion" data-uri="http://tiddlyspace.com/bags/spaced%20bag/tiddlers/tiddler%20x" data-title="tiddler x" ' \
+    assert '<article id="t-tiddler-x" class="transclusion" data-uri="http://tiddlyspace.com/bags/spaced%20bag/tiddlers/tiddler%20x" data-title="tiddler x" ' \
             'data-bag="spaced bag"><p>X is not Y</p></article>' in output
     assert 'We called that from outside,' in output
     assert 'I am <em>tiddler</em>' in output
@@ -158,6 +158,6 @@ We called that from outside, yo, and we'll call it again.
     output = render(tiddlerB, environ)
 
 # Note: the URI here is funkity because of the above config settings
-    assert '<article class="transclusion" data-uri="http://bag.tiddlyspace.com/tiddler%20a" data-title="tiddler a" ' \
+    assert '<article id="t-tiddler-a" class="transclusion" data-uri="http://bag.tiddlyspace.com/tiddler%20a" data-title="tiddler a" ' \
             'data-bag="bag_public"><p>I am <em>tiddler</em></p></article>' in output
     assert 'We called that from outside,' in output
