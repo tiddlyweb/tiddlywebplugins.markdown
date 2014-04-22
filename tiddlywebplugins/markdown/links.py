@@ -101,7 +101,7 @@ class TargetLinks(inlinepatterns.Pattern):
             if matched_text:
                 a = util.etree.Element('a')
                 a.text = util.AtomicString(matched_text)
-                target = m.group(4)
+                target = m.group(4) or m.group(3)
                 a.set('href', self.interlinker(self.config['environ'], target))
                 return a
         return ''

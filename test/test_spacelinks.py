@@ -184,7 +184,12 @@ def test_spaced_target():
     assert '>cow fire<' in output
     assert 'href="http://tiddlyspace.com/tanks/monkey%20business/cow%20fire"' in output
     assert 'fire</a> oh hello' in output
+
     tiddler.text = 'I see [[fire]]@[[monkey business]]'
     output = render(tiddler, environ)
     assert '>fire<' in output
     assert 'href="http://tiddlyspace.com/tanks/monkey%20business/fire"' in output
+
+    tiddler.text = 'I see @[[monkey business]] inside you'
+    output = render(tiddler, environ)
+    assert 'href="http://tiddlyspace.com/tanks/monkey%20business"' in output
