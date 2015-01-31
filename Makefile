@@ -7,7 +7,7 @@ clean:
 	rm -r *.egg-info || true
 
 test: clean
-	py.test -x test
+	py.test -x --tb=short test
 
 dist: test
 	python setup.py sdist

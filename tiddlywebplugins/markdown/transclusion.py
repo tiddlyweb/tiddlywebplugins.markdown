@@ -140,13 +140,14 @@ class TranscludeProcessor(Postprocessor):
 
 class TransclusionExtension(Extension):
 
-    def __init__(self, configs):
+    def __init__(self, *args, **kwargs):
         self.config = {
-                'environ': [{}, 'TiddlyWeb WSGI environ'],
-                'tiddler': [None, 'The tiddler being worked on']
+            'environ': [{}, 'TiddlyWeb WSGI environ'],
+            'tiddler': [None, 'The tiddler being worked on']
         }
-        for key, value in configs:
-            self.setConfig(key, value)
+        # Work around isinstance bool handling in superclass
+        for key, value in kwargs.items():
+            self.config[key][0] = value
 
     def extendMarkdown(self, md, md_globals):
         transcludeProcessor = TranscludeProcessor(TRANSCLUDE_RE,
@@ -155,5 +156,5 @@ class TransclusionExtension(Extension):
         md.postprocessors['transclusion'] = transcludeProcessor
 
 
-def makeExtension(configs=None):
-    return TransclusionExtension(configs=configs)
+def makeExtension(**kwargs):
+    return TransclusionExtension(**kwargs)

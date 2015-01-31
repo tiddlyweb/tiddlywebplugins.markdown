@@ -33,5 +33,5 @@ class TWAutoLink(Extension):
         md.inlinePatterns.add('twautolink', linkPattern, '>autolink')
 
 
-def makeExtension(configs=None):
-    return TWAutoLink(configs=configs)
+def makeExtension(**kwargs):
+    return TWAutoLink(**kwargs)

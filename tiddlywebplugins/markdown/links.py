@@ -29,14 +29,14 @@ FREETARGET = FREELINKB + TARGETLINK_BASE
 
 class MarkdownLinksExtension(WikiLinkExtension):
 
-    def __init__(self, configs):
+    def __init__(self, *args, **kwargs):
         self.config = {
                 'base_url': ['', 'String to append to beginning or URL.'],
                 'end_url': ['', 'String to append to end of URL.'],
                 'html_class': ['wikilink', 'CSS hook. Leave blank for none.'],
                 'environ': [{}, 'Base wsgi environ'],
         }
-        for key, value in configs:
+        for key, value in kwargs.items():
             self.setConfig(key, value)
 
     def extendMarkdown(self, md, md_globals):
@@ -133,8 +133,8 @@ class MarkdownLinks(WikiLinks):
         return a
 
 
-def makeExtension(configs=None):
-    return MarkdownLinksExtension(configs=configs)
+def makeExtension(**kwargs):
+    return MarkdownLinksExtension(**kwargs)
 
 
 def encode_name(name):
